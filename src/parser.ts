@@ -19,13 +19,13 @@ export function parse(burrito: string): ParserOutput[] {
   let burritoStream = burrito;
   let regexResult: RegExpExecArray | null;
   while (regexResult = yamlExtract.exec(burritoStream)) {
-    const start = regexResult.index;
-    const end = yamlExtract.lastIndex;
-    const markdown = md.render(burritoStream.slice(0, start));
-    const yaml = parseYAMLString(burritoStream.slice(start, end));
+    const startYAML = regexResult.index;
+    const endYAML = yamlExtract.lastIndex;
+    const markdown = md.render(burritoStream.slice(0, startYAML));
+    const yaml = parseYAMLString(burritoStream.slice(startYAML, endYAML));
     result.push({ type: "Markdown", value: markdown });
     result.push({ type: "Plugin", value: yaml });
-    burritoStream = burritoStream.slice(end);
+    burritoStream = burritoStream.slice(endYAML);
     yamlExtract.lastIndex = 0;
   }
 
