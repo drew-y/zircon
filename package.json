@@ -1,0 +1,30 @@
+{
+  "name": "burrito",
+  "version": "0.0.1",
+  "description": "A simple static site generator for review oriented websites",
+  "main": "dist/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/youngwerth/burrito.git"
+  },
+  "keywords": [
+    "cms",
+    "burrito",
+    "static"
+  ],
+  "author": "Drew Youngwerth",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://gitlab.com/youngwerth/burrito/issues"
+  },
+  "homepage": "https://gitlab.com/youngwerth/burrito#README",
+  "dependencies": {
+    "@types/node": "^8.0.26",
+    "@types/yamljs": "^0.2.30",
+    "remarkable": "^1.7.1",
+    "yamljs": "^0.3.0"
+  }
+}
