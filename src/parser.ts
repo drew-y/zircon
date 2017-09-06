@@ -8,31 +8,6 @@ export interface ParserOutput {
   value: object | string
 }
 
-const testStr = `
-<<<<<<<<<<<<<<<<<<<<<<<
-plugin: metadata
-author: Drew Youngwerth
-title: A Good Burrito
-subtitle: Trust Me
-date: 2017-9-5
->>>>>>>>>>>>>>>>>>>>>>>
-
-This is a good burrito. It has these ingredients:
-- Tortilla
-- Chicken
-- Salsa
-
-<<<<<<<<<<<<<<<<<<<<<<<
-plugin: rating
-taste: 6
-texture: 7
-price: 8
-presentation: 4
-overall: 6
-verdict: Edible
->>>>>>>>>>>>>>>>>>>>>>>
-`;
-
 function parseYAMLString(yaml: string): object {
   return YAML.parse(yaml.replace(/(\<{3,}|\>{3,})/gm, ""));
 }
@@ -43,21 +18,16 @@ export function parse(burrito: string): ParserOutput[] {
 
   let burritoStream = burrito;
   let regexResult: RegExpExecArray | null;
-  while ((regexResult = yamlExtract.exec(burrito))) {
+  while (regexResult = yamlExtract.exec(burritoStream)) {
     const start = regexResult.index;
     const end = yamlExtract.lastIndex;
-    result.push({
-      type: "Markdown",
-      value: md.render(burritoStream.slice(start))
-    });
-    result.push({
-      type: "Plugin",
-      value: parseYAMLString(burritoStream.slice(start, end))
-    });
+    const markdown = md.render(burritoStream.slice(0, start));
+    const yaml = parseYAMLString(burritoStream.slice(start, end));
+    result.push({ type: "Markdown", value: markdown });
+    result.push({ type: "Plugin", value: yaml });
     burritoStream = burritoStream.slice(end);
+    yamlExtract.lastIndex = 0;
   }
 
   return result;
 }
-
-console.log(parse(testStr));
