@@ -15,4 +15,13 @@ export class Engine {
     opts.helpers.forEach(helper => this.bars.registerPartial(helper.name, helper.fn));
     opts.layouts.forEach(layout => this.layouts[layout.name] = this.bars.compile(layout.body));
   }
+
+  render(opts: {
+    layout: string,
+    data: object,
+    page: string
+  }): string {
+    const content = this.bars.compile(opts.page)(opts.data);
+    return this.layouts[opts.layout]({ content, data: opts.data });
+  }
 }
