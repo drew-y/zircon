@@ -1,33 +1,57 @@
-import Remarkable = require("remarkable");
 import YAML = require("yamljs");
 
-const md = new Remarkable();
+type ParserOutput = { metadata: object | null, body: string };
 
-export interface ParserOutput {
-  type: "Plugin" | "Markdown",
-  value: object | string
-}
-
-function parseYAMLString(yaml: string): object {
-  return YAML.parse(yaml.replace(/(\<{3,}|\>{3,})/gm, ""));
-}
-
-export function parse(burrito: string): ParserOutput[] {
-  const yamlExtract = /\<{3,}[^(\>\>\>)]*\>{3,}/gm;
-  const result: ParserOutput[] = [];
-
-  let burritoStream = burrito;
-  let regexResult: RegExpExecArray | null;
-  while (regexResult = yamlExtract.exec(burritoStream)) {
-    const startYAML = regexResult.index;
-    const endYAML = yamlExtract.lastIndex;
-    const markdown = md.render(burritoStream.slice(0, startYAML));
-    const yaml = parseYAMLString(burritoStream.slice(startYAML, endYAML));
-    result.push({ type: "Markdown", value: markdown });
-    result.push({ type: "Plugin", value: yaml });
-    burritoStream = burritoStream.slice(endYAML);
-    yamlExtract.lastIndex = 0;
+function parseYAMLString(yaml: string): object | null {
+  try {
+    return YAML.parse(yaml.replace(/-{3,}/gm, ""));
+  } catch (error) {
+    console.log("Error in YAML header:");
+    console.log(yaml);
+    return null;
   }
-
-  return result;
 }
+
+function extractYAML(opts: { start: number, end: number, burrito: string }): ParserOutput {
+  return {
+    body: opts.burrito.slice(opts.end).trim(),
+    metadata: parseYAMLString(opts.burrito.slice(opts.start, opts.end))
+  }
+}
+
+export function parse(burrito: string): ParserOutput {
+  const regex = /^-{3,}[^-]+-{3,}/g;
+  const trimmedBurrito = burrito.trim();
+  const match = regex.exec(trimmedBurrito);
+  if (match) {
+    return extractYAML({
+      start: match.index,
+      end: regex.lastIndex,
+      burrito: trimmedBurrito
+    });
+  }
+  return { body: trimmedBurrito, metadata: null };
+}
+
+const test = `
+--------------------------
+title: How Does this work
+author: Drew Youngwerth
+rating: 5
+--------------------------
+
+# This is a title of markdown
+
+Here's a list
+- Hello
+- World
+- How
+
+1. eggs
+2. potatoes
+3. tomatos
+
+> Quote me!
+`;
+
+console.log(parse(test));
