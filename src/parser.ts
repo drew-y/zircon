@@ -32,26 +32,3 @@ export function parse(burrito: string): ParserOutput {
   }
   return { body: trimmedBurrito, metadata: null };
 }
-
-const test = `
---------------------------
-title: How Does this work
-author: Drew Youngwerth
-rating: 5
---------------------------
-
-# This is a title of markdown
-
-Here's a list
-- Hello
-- World
-- How
-
-1. eggs
-2. potatoes
-3. tomatos
-
-> Quote me!
-`;
-
-console.log(parse(test));
