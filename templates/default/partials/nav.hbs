@@ -1,0 +1,39 @@
+<nav class="navbar">
+  <div class="navbar-brand">
+    <a href="/" class="navbar-item">
+      <img class="logo" src="/assets/logo.png" />
+    </a>
+
+    <span class="navbar-burger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </div>
+
+  <div class="nav-right nav-menu">
+    <a href="/pages/products.html" class="nav-item">Products</a>
+    <a href="/pages/testimonials.html" class="nav-item">Testimonials</a>
+    <a href="/pages/resources.html" class="nav-item">Resources</a>
+    <a href="/pages/company.html" class="nav-item is-active">Company</a>
+    <a href="/pages/contact.html" class="nav-item">Contact Us</a>
+  </div>
+
+  <script>
+    var toggle = document.querySelector(".navbar-burger");
+    var menu = document.querySelector(".nav-menu");
+    var state = 0;
+    toggle.onclick = function() {
+      if (state === 0) {
+        toggle.classList.add("is-active");
+        menu.classList.add("is-active");
+        state = 1;
+        return;
+      }
+
+      toggle.classList.remove("is-active");
+      menu.classList.remove("is-active");
+      state = 0;
+    }
+  </script>
+</nav>
