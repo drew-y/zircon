@@ -22,10 +22,12 @@
   },
   "homepage": "https://gitlab.com/youngwerth/burrito#README",
   "dependencies": {
+    "handlebars": "^4.0.10",
     "remarkable": "^1.7.1",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
+    "@types/handlebars": "^4.0.36",
     "@types/node": "^8.0.26",
     "@types/yamljs": "^0.2.30"
   }
