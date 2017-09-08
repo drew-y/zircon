@@ -1,5 +1,5 @@
 import fs = require("fs");
-import util = require("util");
+import path = require("path");
 
 enum FSItemType {
   directory = "Directory",
@@ -10,7 +10,8 @@ interface FSItem {
   type: FSItemType;
   name: string;
   directory: string;
-  contents: string | FSItem[];
+  path: string;
+  contents?: FSItem[];
 }
 
 export function walk(dir: string): FSItem[] {
@@ -25,7 +26,7 @@ export function walk(dir: string): FSItem[] {
         type: FSItemType.file,
         name: item,
         directory: dir,
-        contents: fs.readFileSync(location, { encoding: "utf8" })
+        path: path.resolve(location)
       });
       continue;
     }
@@ -35,6 +36,7 @@ export function walk(dir: string): FSItem[] {
         type: FSItemType.directory,
         name: item,
         directory: dir,
+        path: path.resolve(location),
         contents: walk(location)
       });
     }
