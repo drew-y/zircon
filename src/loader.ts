@@ -1,13 +1,12 @@
 import fs = require("fs");
 import path = require("path");
-import util = require("util");
 
 export enum FSItemType {
   directory = "Directory",
   file = "File"
 }
 
-interface FSItem {
+export interface FSItem {
   /** Item is directory or file */
   type: FSItemType;
   /** Filename without extension */

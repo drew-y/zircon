@@ -22,9 +22,12 @@
   },
   "homepage": "https://gitlab.com/youngwerth/burrito#README",
   "dependencies": {
+    "@types/fs-extra": "^4.0.2",
+    "fs-extra": "^4.0.1",
     "handlebars": "^4.0.10",
     "klaw": "^2.1.0",
     "remarkable": "^1.7.1",
+    "typescript": "^2.5.2",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
