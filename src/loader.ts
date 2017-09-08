@@ -1,16 +1,24 @@
 import fs = require("fs");
 import path = require("path");
+import util = require("util");
 
-enum FSItemType {
+export enum FSItemType {
   directory = "Directory",
   file = "File"
 }
 
 interface FSItem {
+  /** Item is directory or file */
   type: FSItemType;
+  /** Filename without extension */
   name: string;
+  /** Relative directory of item */
   directory: string;
+  /** Absolute directory of item */
   path: string;
+  /** Filename with extension */
+  base: string;
+  /** If the item is a directory contents holds more FSItems */
   contents?: FSItem[];
 }
 
@@ -24,7 +32,8 @@ export function walk(dir: string): FSItem[] {
     if (stats.isFile()) {
       fsItems.push({
         type: FSItemType.file,
-        name: item,
+        base: item,
+        name: path.parse(item).name,
         directory: dir,
         path: path.resolve(location)
       });
@@ -34,7 +43,8 @@ export function walk(dir: string): FSItem[] {
     if (stats.isDirectory()) {
       fsItems.push({
         type: FSItemType.directory,
-        name: item,
+        base: item,
+        name: path.parse(item).name,
         directory: dir,
         path: path.resolve(location),
         contents: walk(location)
