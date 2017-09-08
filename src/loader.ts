@@ -11,14 +11,12 @@ export interface FSItem {
   type: FSItemType;
   /** Filename without extension */
   name: string;
-  /** Relative directory of item */
-  directory: string;
-  /** Absolute directory of item */
+  /** Absolute path of item */
   path: string;
   /** Filename with extension */
   base: string;
   /** If the item is a directory contents holds more FSItems */
-  contents?: FSItem[];
+  contents: FSItem[];
 }
 
 export function walk(dir: string): FSItem[] {
@@ -33,8 +31,8 @@ export function walk(dir: string): FSItem[] {
         type: FSItemType.file,
         base: item,
         name: path.parse(item).name,
-        directory: dir,
-        path: path.resolve(location)
+        path: path.resolve(location),
+        contents: []
       });
       continue;
     }
@@ -44,7 +42,6 @@ export function walk(dir: string): FSItem[] {
         type: FSItemType.directory,
         base: item,
         name: path.parse(item).name,
-        directory: dir,
         path: path.resolve(location),
         contents: walk(location)
       });
