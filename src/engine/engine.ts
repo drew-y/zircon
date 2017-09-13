@@ -19,13 +19,6 @@ export class Engine {
     opts.layouts.forEach(layout => this.layouts[layout.name] = this.bars.compile(layout.body));
   }
 
-  // private addBurritoHelper() {
-  //   const self = this;
-  //   this.bars.registerHelper('burrito', function(md: string) {
-  //     return self.md.render(md);
-  //   })
-  // }
-
   render(page: string, api: object): string {
     const parsed = parse(page);
     parsed.metadata["burrito"] = api;
