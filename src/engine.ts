@@ -9,17 +9,17 @@ import { newSite } from "./helpers";
 const TEMP_DIR = "./temp-site"
 
 export class Engine {
-  private readonly dirPath: string;
+  private readonly inputPath: string;
   private readonly outPath: string;
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
   private site: Site = newSite("", "./");
   private defaults = {};
 
-  constructor(dirPath: string, outPath: string) {
-    this.dirPath = dirPath;
-    this.outPath = dirPath;
-    this.dir = walk(dirPath);
+  constructor(inputPath: string, outPath: string) {
+    this.inputPath = inputPath;
+    this.outPath = outPath;
+    this.dir = walk(inputPath);
   }
 
   private readLayout(item: FSItem) {
@@ -97,7 +97,7 @@ export class Engine {
 
   private readDefaults() {
     try {
-      const defaults = YAML.parse(fs.readFileSync(this.dirPath + "/defaults.yml", "utf8"));
+      const defaults = YAML.parse(fs.readFileSync(this.inputPath + "/defaults.yml", "utf8"));
       this.defaults = defaults || {};
     } catch (e) { }
   }
