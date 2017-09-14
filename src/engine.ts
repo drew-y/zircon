@@ -10,13 +10,15 @@ const TEMP_DIR = "./temp-site"
 
 export class Engine {
   private readonly dirPath: string;
+  private readonly outPath: string;
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
   private site: Site = newSite("", "./");
   private defaults = {};
 
-  constructor(dirPath: string) {
+  constructor(dirPath: string, outPath: string) {
     this.dirPath = dirPath;
+    this.outPath = dirPath;
     this.dir = walk(dirPath);
   }
 
@@ -39,7 +41,7 @@ export class Engine {
   }
 
   private copyStatic(item: FSItem) {
-    fs.copySync(item.path, "./site/static");
+    fs.copySync(item.path, this.outPath + "/static");
   }
 
   private removeTempDir() {
@@ -68,7 +70,7 @@ export class Engine {
     return site;
   }
 
-  private writeSite(sitePiece: Site, dir: string = "./site") {
+  private writeSite(sitePiece: Site, dir: string = this.outPath) {
     fs.mkdirpSync(dir);
     for (const item of sitePiece.files) {
       try {
