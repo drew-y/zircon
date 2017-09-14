@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import program = require("commander");
-import fs = require("fs");
+import fs = require("fs-extra");
 import { Engine } from "./engine";
 
 const DEFUALT_INPUT_PATH = "./";
@@ -14,5 +14,13 @@ program
     const engine = new Engine(input || DEFUALT_INPUT_PATH, output || DEFUALT_OUTPUT_PATH);
     engine.generate();
   });
+
+program
+  .version("0.0.1")
+  .command("init <destination>")
+  .action((destination: string) => {
+    fs.copy(__dirname + "/../example", destination);
+  });
+
 
 program.parse(process.argv);
