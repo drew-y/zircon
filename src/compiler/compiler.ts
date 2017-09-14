@@ -9,7 +9,12 @@ export class Compiler {
   private readonly layouts: { [name: string]: HandlebarsTemplateDelegate } = {};
 
   private mergeDefaultsWithPageMetadata(defaults: object, metadata: object): object {
-    return Object.assign(defaults, metadata);
+    return Object.assign(metadata, defaults);
+  }
+
+  private checkLayoutExists(layoutName: string) {
+    if (!(this.layouts[layoutName] instanceof Function))
+      throw new Error("Layout not found");
   }
 
   addPartial(name: string, partial: string) {
@@ -31,6 +36,8 @@ export class Compiler {
   } {
     const parsed = parse(document);
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
+    console.log("METADATA:");
+    console.log(metadata);
     const body = this.md.render(this.bars.compile(parsed.body)(metadata));
     return { metadata, body };
   }
@@ -42,6 +49,7 @@ export class Compiler {
     body: string
   }) {
     const { metadata, body, site } = opts;
+    this.checkLayoutExists(metadata.layout);
     return this.layouts[metadata.layout]({
       content: body, metadata, site
     });
