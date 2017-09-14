@@ -3,7 +3,8 @@ export interface Site {
   path: string;
   files: {
     metadata: object,
-    name: string
+    name: string,
+    path: string
   }[];
   subSites: Site[];
 }

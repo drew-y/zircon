@@ -1,6 +1,7 @@
 import Handlebars = require("handlebars");
 import Remarkable = require("remarkable");
 import { parse } from "./parser";
+import { Site } from "../definitions";
 
 export class Compiler {
   private readonly md = new Remarkable();
@@ -23,13 +24,26 @@ export class Compiler {
     this.layouts[name] = this.bars.compile(body)
   }
 
-  compile(page: string, defaults: object): {
-    metadata: object,
+  /** Interprets a burrito document */
+  compile(document: string, defaults: object): {
+    metadata: { [key: string]: any },
     body: string
   } {
-    const parsed = parse(page);
+    const parsed = parse(document);
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
     const body = this.md.render(this.bars.compile(parsed.body)(metadata));
     return { metadata, body };
+  }
+
+  /** Compiles a document to html */
+  compileLayout(opts: {
+    metadata: { [key: string]: any },
+    site: Site,
+    body: string
+  }) {
+    const { metadata, body, site } = opts;
+    return this.layouts[metadata.layout]({
+      content: body, metadata, site
+    });
   }
 }
