@@ -19,7 +19,7 @@ function highlight(str: string, lang: string) {
 }
 
 export class Compiler {
-  private readonly md = new Remarkable({ highlight });
+  private readonly md = new Remarkable({ highlight, html: true });
   private readonly bars = Handlebars.create();
   private readonly layouts: { [name: string]: HandlebarsTemplateDelegate } = {};
 
