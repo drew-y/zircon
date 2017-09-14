@@ -11,14 +11,15 @@ function extractYAML(opts: { start: number, end: number, burrito: string }): Par
   return { body: opts.burrito.slice(opts.end).trim(), metadata: (metadata ? metadata : { }) };
 }
 
-export function parse(burrito: string): ParserOutput {
+function findYAML(trimmedBurrito: string): { start: number, end: number } {
   const regex = /^-{3,}[^-]+-{3,}/g;
-  const trimmedBurrito = burrito.trim();
   const match = regex.exec(trimmedBurrito);
-  if (!match) throw new Error("Could not find yaml header");
-  return extractYAML({
-    start: match.index,
-    end: regex.lastIndex,
-    burrito: trimmedBurrito
-  });
+  if (!match) return { start: 0, end: 0 };
+  return { start: match.index, end: regex.lastIndex };
+}
+
+export function parse(burrito: string): ParserOutput {
+  const trimmedBurrito = burrito.trim();
+  const { start, end } = findYAML(trimmedBurrito);
+  return extractYAML({ start, end, burrito: trimmedBurrito });
 }

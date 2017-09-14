@@ -1,6 +1,6 @@
 import fs = require("fs-extra");
 import Handlebars = require("handlebars");
-import util = require("util");
+import YAML = require("yamljs");
 import { walk } from "./loader";
 import { Compiler } from "./compiler";
 import { FSItem, FSItemType, Site } from "./definitions";
@@ -84,8 +84,10 @@ export class Engine {
 
   private readSrcDir() {
     for (const item of this.dir) {
-      if (!(item.type === FSItemType.directory)) break;
       switch (item.name) {
+        case "defaults":
+          const defaults = YAML.parse(fs.readFileSync(item.path, "utf8"));
+          this.defaults = defaults || {};
         case "layouts":
           this.readLayout(item);
           break;
@@ -104,7 +106,7 @@ export class Engine {
         default:
           break;
       }
-    }
+    };
   }
 
   generate() {
