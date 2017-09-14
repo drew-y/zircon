@@ -36,8 +36,6 @@ export class Compiler {
   } {
     const parsed = parse(document);
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
-    console.log("METADATA:");
-    console.log(metadata);
     const body = this.md.render(this.bars.compile(parsed.body)(metadata));
     return { metadata, body };
   }
