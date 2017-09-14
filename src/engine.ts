@@ -9,13 +9,15 @@ import { newSite } from "./helpers";
 const TEMP_DIR = "./temp-site"
 
 export class Engine {
+  private readonly dirPath: string;
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
   private site: Site = newSite("", "./");
   private defaults = {};
 
-  constructor() {
-    this.dir = walk("./example");
+  constructor(dirPath: string) {
+    this.dirPath = dirPath;
+    this.dir = walk(dirPath);
   }
 
   private readLayout(item: FSItem) {
@@ -69,11 +71,20 @@ export class Engine {
   private writeSite(sitePiece: Site, dir: string = "./site") {
     fs.mkdirpSync(dir);
     for (const item of sitePiece.files) {
-      const body = this.compiler.compileLayout({
-        metadata: item.metadata, site: this.site,
-        body: fs.readFileSync(item.path, 'utf8')
-      })
-      fs.writeFileSync(`${dir}/${item.name}.html`, body);
+      try {
+        const body = this.compiler.compileLayout({
+          metadata: item.metadata, site: this.site,
+          body: fs.readFileSync(item.path, 'utf8')
+        });
+        fs.writeFileSync(`${dir}/${item.name}.html`, body);
+      } catch (error) {
+        console.log(`
+          ${item.path}
+          ${error.message}
+        `);
+        this.removeTempDir();
+        process.exit(0);
+      }
     }
     for (const item of sitePiece.subSites) {
       this.writeSite(item, `${dir}/${item.name}`);
@@ -82,12 +93,16 @@ export class Engine {
     return sitePiece;
   }
 
+  private readDefaults() {
+    try {
+      const defaults = YAML.parse(fs.readFileSync(this.dirPath + "/defaults.yml", "utf8"));
+      this.defaults = defaults || {};
+    } catch (e) { }
+  }
+
   private readSrcDir() {
     for (const item of this.dir) {
       switch (item.name) {
-        case "defaults":
-          const defaults = YAML.parse(fs.readFileSync(item.path, "utf8"));
-          this.defaults = defaults || {};
         case "layouts":
           this.readLayout(item);
           break;
@@ -110,10 +125,9 @@ export class Engine {
   }
 
   generate() {
+    this.readDefaults();
     this.readSrcDir();
     this.writeSite(this.site);
     this.removeTempDir();
   }
 }
-
-new Engine().generate();
