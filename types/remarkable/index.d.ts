@@ -1,6 +1,6 @@
 declare module 'remarkable' {
   class Remarkable {
-    constructor();
+    constructor(opts?: { [index: string]: any });
     render(markdown: string): string;
   }
 

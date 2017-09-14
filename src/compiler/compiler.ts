@@ -1,10 +1,25 @@
 import Handlebars = require("handlebars");
 import Remarkable = require("remarkable");
+import hljs = require("highlight.js");
 import { parse } from "./parser";
 import { Site } from "../definitions";
 
+function highlight(str: string, lang: string) {
+  if (lang && hljs.getLanguage(lang)) {
+    try {
+      return hljs.highlight(lang, str).value;
+    } catch (err) {}
+  }
+
+  try {
+    return hljs.highlightAuto(str).value;
+  } catch (err) {}
+
+  return ''; // use external default escaping
+}
+
 export class Compiler {
-  private readonly md = new Remarkable();
+  private readonly md = new Remarkable({ highlight });
   private readonly bars = Handlebars.create();
   private readonly layouts: { [name: string]: HandlebarsTemplateDelegate } = {};
 
