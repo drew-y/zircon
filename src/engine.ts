@@ -44,6 +44,10 @@ export class Engine {
     fs.copySync(item.path, this.outPath + "/static");
   }
 
+  private copyFavicon(item: FSItem) {
+    fs.copySync(item.path, this.outPath + "/");
+  }
+
   private removeTempDir() {
     fs.remove(TEMP_DIR);
   }
@@ -119,6 +123,9 @@ export class Engine {
           break;
         case "static":
           this.copyStatic(item);
+          break;
+        case "favicon":
+          this.copyFavicon(item);
           break;
         default:
           break;
