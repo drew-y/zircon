@@ -21,13 +21,6 @@ program
     engine.generate();
   });
 
- program
-  .version("0.0.1")
-  .action((input: string, output?: string) => {
-    const engine = new Engine(DEFUALT_INPUT_PATH, DEFUALT_OUTPUT_PATH);
-    engine.generate();
-  });
-
 program
   .version("0.0.1")
   .command("init <destination>")
