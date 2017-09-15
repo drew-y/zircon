@@ -45,7 +45,7 @@ export class Engine {
   }
 
   private copyFavicon(item: FSItem) {
-    fs.copySync(item.path, this.outPath + item.name);
+    fs.copySync(item.path, this.outPath + "/" + item.base);
   }
 
   private removeTempDir() {
