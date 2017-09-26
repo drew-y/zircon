@@ -8,18 +8,22 @@ import { newSite } from "./helpers";
 
 const TEMP_DIR = "./temp-site"
 
+export interface EngineOpts {
+  inputPath: string,
+  outPath: string,
+  skipStatic?: boolean
+}
+
 export class Engine {
-  private readonly inputPath: string;
-  private readonly outPath: string;
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
+  private readonly opts: EngineOpts;
   private site: Site = newSite("", "./");
   private defaults = {};
 
-  constructor(inputPath: string, outPath: string) {
-    this.inputPath = inputPath;
-    this.outPath = outPath;
-    this.dir = walk(inputPath);
+  constructor(opts: EngineOpts) {
+    this.opts = opts;
+    this.dir = walk(opts.inputPath);
   }
 
   private readLayout(item: FSItem) {
@@ -41,11 +45,11 @@ export class Engine {
   }
 
   private copyStatic(item: FSItem) {
-    fs.copySync(item.path, this.outPath + "/static");
+    fs.copySync(item.path, this.opts.outPath + "/static");
   }
 
   private copyFavicon(item: FSItem) {
-    fs.copySync(item.path, this.outPath + "/" + item.base);
+    fs.copySync(item.path, this.opts.outPath + "/" + item.base);
   }
 
   private removeTempDir() {
@@ -74,7 +78,7 @@ export class Engine {
     return site;
   }
 
-  private writeSite(sitePiece: Site, dir: string = this.outPath) {
+  private writeSite(sitePiece: Site, dir: string = this.opts.outPath) {
     fs.mkdirpSync(dir);
     for (const item of sitePiece.files) {
       try {
@@ -101,7 +105,8 @@ export class Engine {
 
   private readDefaults() {
     try {
-      const defaults = YAML.parse(fs.readFileSync(this.inputPath + "/defaults.yml", "utf8"));
+      const defaults =
+        YAML.parse(fs.readFileSync(this.opts.inputPath + "/defaults.yml", "utf8"));
       this.defaults = defaults || {};
     } catch (e) { }
   }
@@ -122,7 +127,8 @@ export class Engine {
           this.site = this.readContent(item);
           break;
         case "static":
-          this.copyStatic(item);
+          if (!this.opts.skipStatic)
+            this.copyStatic(item);
           break;
         case "favicon":
           this.copyFavicon(item);
@@ -134,7 +140,7 @@ export class Engine {
   }
 
   generate() {
-    fs.mkdirpSync(this.outPath);
+    fs.mkdirpSync(this.opts.outPath);
     this.readDefaults();
     this.readSrcDir();
     this.writeSite(this.site);

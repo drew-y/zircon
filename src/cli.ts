@@ -7,26 +7,24 @@ import { Engine } from "./engine";
 const DEFUALT_INPUT_PATH = "./";
 const DEFUALT_OUTPUT_PATH = "./site";
 
-if (process.argv.length <= 2) {
-  const engine = new Engine(DEFUALT_INPUT_PATH, DEFUALT_OUTPUT_PATH);
-  engine.generate();
-  process.exit(0);
-}
-
 program
   .version("0.0.1")
-  .arguments("[input] [output]")
-  .action((input: string, output?: string) => {
-    const engine = new Engine(input, output || DEFUALT_OUTPUT_PATH);
-    engine.generate();
-  });
+  .option("-s, --skip-static", "Skip copying the static directory")
+  .arguments("[input] [output]");
 
 program
-  .version("0.0.1")
   .command("init <destination>")
   .action((destination: string) => {
+    console.log("Initializing");
     fs.copy(__dirname + "/../example", destination);
+    process.exit(0);
   });
 
-
 program.parse(process.argv);
+
+const engine = new Engine({
+  inputPath: program.args[0] || DEFUALT_INPUT_PATH,
+  outPath: program.args[1] || DEFUALT_OUTPUT_PATH,
+  skipStatic: program.skipStatic
+});
+engine.generate();
