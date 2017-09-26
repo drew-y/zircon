@@ -13,4 +13,4 @@ It does:
 - Stuff
 - Sales
 
-Please note this is an extremely early alpha trial
+Please note this is an extremely early alpha version
