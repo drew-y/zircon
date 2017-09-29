@@ -10,10 +10,12 @@ export function walk(dir: string): FSItem[] {
     const location = dir + "/" + item;
     const stats = fs.lstatSync(location);
     if (stats.isFile()) {
+      const parsedPath = path.parse(item);
       fsItems.push({
         type: FSItemType.file,
         base: item,
-        name: path.parse(item).name,
+        name: parsedPath.name,
+        extension: parsedPath.ext,
         path: path.resolve(location),
         contents: []
       });
@@ -21,10 +23,12 @@ export function walk(dir: string): FSItem[] {
     }
 
     if (stats.isDirectory()) {
+      const parsedPath = path.parse(item);
       fsItems.push({
         type: FSItemType.directory,
         base: item,
-        name: path.parse(item).name,
+        name: parsedPath.name,
+        extension: parsedPath.ext,
         path: path.resolve(location),
         contents: walk(location)
       });

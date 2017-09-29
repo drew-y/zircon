@@ -45,13 +45,14 @@ export class Compiler {
   }
 
   /** Interprets a burrito document */
-  compile(document: string, defaults: object): {
+  compile(document: string, defaults: object, isPureHTML: boolean = false): {
     metadata: { [key: string]: any },
     body: string
   } {
     const parsed = parse(document);
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
-    const body = this.md.render(this.bars.compile(parsed.body)(metadata));
+    const handlebarsCompiled = this.bars.compile(parsed.body)(metadata);
+    const body = isPureHTML ? handlebarsCompiled : this.md.render(handlebarsCompiled);
     return { metadata, body };
   }
 

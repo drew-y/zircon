@@ -19,6 +19,8 @@ export interface FSItem {
   type: FSItemType;
   /** Filename without extension */
   name: string;
+  /** File extension */
+  extension: string;
   /** Absolute path of item */
   path: string;
   /** Filename with extension */

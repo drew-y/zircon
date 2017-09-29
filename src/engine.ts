@@ -66,7 +66,7 @@ export class Engine {
       }
       const document = this.compiler.compile(
         fs.readFileSync(item.path, 'utf8'),
-        this.defaults
+        this.defaults, item.extension === ".html"
       );
       fs.writeFileSync(`${dir}/${item.name}.html`, document.body);
       site.files.push({
