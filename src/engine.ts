@@ -58,23 +58,30 @@ export class Engine {
 
   private readContent(content: FSItem, dir: string = TEMP_DIR): Site {
     const site = newSite(content.name, dir)
+
     fs.mkdirpSync(dir);
+
     for (const item of content.contents) {
+
       if (item.type === FSItemType.directory) {
         site.subSites.push(this.readContent(item, `${dir}/${item.base}`));
         continue;
       }
-      const document = this.compiler.compile(
-        fs.readFileSync(item.path, 'utf8'),
-        this.defaults, item.extension === ".html"
-      );
+
+      const document = this.compiler.compile({
+        document: fs.readFileSync(item.path, 'utf8'),
+        defaults: this.defaults, item
+      });
+
       fs.writeFileSync(`${dir}/${item.name}.html`, document.body);
+
       site.files.push({
         metadata: document.metadata,
         name: item.name,
         path: `${dir}/${item.name}.html`
-      })
+      });
     }
+
     return site;
   }
 

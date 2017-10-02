@@ -2,7 +2,7 @@ import Handlebars = require("handlebars");
 import Remarkable = require("remarkable");
 import hljs = require("highlight.js");
 import { parse } from "./parser";
-import { Site } from "../definitions";
+import { Site, FSItem } from "../definitions";
 
 function highlight(str: string, lang: string) {
   if (lang && hljs.getLanguage(lang)) {
@@ -45,14 +45,34 @@ export class Compiler {
   }
 
   /** Interprets a burrito document */
-  compile(document: string, defaults: object, isPureHTML: boolean = false): {
+  compile(opts: {
+    document: string,
+    defaults: object,
+    item: FSItem
+  }): {
     metadata: { [key: string]: any },
     body: string
   } {
+    const { document, defaults, item } = opts;
+
+    // Just return the document if the file is already html
+    if (item.extension === ".html")
+      return { metadata: {}, body: document };
+
+    // Extract document body and metadata
     const parsed = parse(document);
+
+    // Merge document metadata with default metadata
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
-    const handlebarsCompiled = this.bars.compile(parsed.body)(metadata);
-    const body = isPureHTML ? handlebarsCompiled : this.md.render(handlebarsCompiled);
+
+    // Compile any handlebars content within the document body
+    let body = this.bars.compile(parsed.body)(metadata);
+
+    // Check to see if the file is .md if it is we need to compile the markdown
+    if (item.extension === ".md") {
+      body = this.md.render(body);
+    }
+
     return { metadata, body };
   }
 
