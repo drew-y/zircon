@@ -1,6 +1,6 @@
 {
   "name": "make-burrito",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A simple static site generator for review oriented websites",
   "main": "dist/index.js",
   "types": "src/index.js",

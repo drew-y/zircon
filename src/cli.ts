@@ -18,7 +18,8 @@ program
   .description("Initialize a new site")
   .action((destination: string) => {
     console.log("Initializing");
-    fs.copy(__dirname + "/../example", destination);
+    console.log(__dirname + "/../example");
+    fs.copySync(__dirname + "/../example", destination);
     process.exit(0);
   });
 
