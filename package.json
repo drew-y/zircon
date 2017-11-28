@@ -1,5 +1,5 @@
 {
-  "name": "burrito",
+  "name": "make-burrito",
   "version": "0.0.1",
   "description": "A simple static site generator for review oriented websites",
   "main": "dist/index.js",
