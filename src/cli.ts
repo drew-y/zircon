@@ -2,6 +2,7 @@
 
 import program = require("commander");
 import fs = require("fs-extra");
+import chokidar = require("chokidar");
 import { Engine } from "./engine";
 
 const DEFUALT_INPUT_PATH = "./";
@@ -26,15 +27,31 @@ program
   .option("-s, --skip-static", "Skip copying the static directory")
   .description("Watch the directory for file changes")
   .action((input?: string, output?: string) => {
-    console.log("watching")
-    console.log(input);
-    console.log(output);
-    // const engine = new Engine({
-    //   inputPath: input || DEFUALT_INPUT_PATH,
-    //   outPath: output || DEFUALT_OUTPUT_PATH,
-    //   skipStatic: program.skipStatic
-    // });
-    // engine.generate();
+    const outPath = output || DEFUALT_OUTPUT_PATH;
+    const inputPath = input || DEFUALT_INPUT_PATH;
+
+    const engine = new Engine({
+      inputPath, outPath,
+      skipStatic: program.skipStatic
+    });
+
+    const watcher = chokidar.watch([
+      inputPath + "content/**",
+      inputPath + "static/**",
+      inputPath + "layouts/**",
+      inputPath + "partials/**",
+      inputPath + "defaults.yml",
+    ]);
+
+    watcher
+      .on("ready", () => console.log("Watching..."))
+      .on("change", path => console.log(`File ${path} has been changed`))
+      .on("change", (...args: any[]) => {
+        console.log("Building");
+        engine.generate();
+      });
+
+    engine.generate();
   });
 
 program
@@ -42,23 +59,24 @@ program
   .option("-s, --skip-static", "Skip copying the static directory")
   .description("Build the burrito site")
   .action((input?: string, output?: string) => {
-    console.log("building")
-    console.log(input);
-    console.log(output);
-    // const engine = new Engine({
-    //   inputPath: input || DEFUALT_INPUT_PATH,
-    //   outPath: output || DEFUALT_OUTPUT_PATH,
-    //   skipStatic: program.skipStatic
-    // });
-    // engine.generate();
+    const engine = new Engine({
+      inputPath: input || DEFUALT_INPUT_PATH,
+      outPath: output || DEFUALT_OUTPUT_PATH,
+      skipStatic: program.skipStatic
+    });
+    engine.generate();
   });
 
 program
   .command('*')
-  .action(function() {
-    console.log('Unknown Command: ' + program.args.join(' '))
-    program.help()
-  })
+  .action((input?: string, output?: string) => {
+    const engine = new Engine({
+      inputPath: input || DEFUALT_INPUT_PATH,
+      outPath: output || DEFUALT_OUTPUT_PATH,
+      skipStatic: program.skipStatic
+    });
+    engine.generate();
+  });
 
 program.parse(process.argv);
 
