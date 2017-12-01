@@ -1,7 +1,7 @@
 import Handlebars = require("handlebars");
 import Remarkable = require("remarkable");
 import hljs = require("highlight.js");
-import { parse } from "./parser";
+import { extractDocumentBodyAndMetadata } from "./parser";
 import { Site, FSItem } from "../definitions";
 
 function highlight(str: string, lang: string) {
@@ -44,7 +44,10 @@ export class Compiler {
     this.layouts[name] = this.bars.compile(body)
   }
 
-  /** Interprets a burrito document */
+  /**
+   * Compile a document.
+   * Supported formats are .hbs, .html, and markdown
+   */
   compile(opts: {
     document: string,
     defaults: object,
@@ -55,15 +58,14 @@ export class Compiler {
   } {
     const { document, defaults, item } = opts;
 
-    // Just return the document if the file is already html
-    if (item.extension === ".html")
-      return { metadata: {}, body: document };
-
     // Extract document body and metadata
-    const parsed = parse(document);
+    const parsed = extractDocumentBodyAndMetadata(document);
 
     // Merge document metadata with default metadata
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
+
+    // Just return the document if the file is already html
+    if (item.extension === ".html") return { metadata, body: parsed.body };
 
     // Compile any handlebars content within the document body
     let body = this.bars.compile(parsed.body)(metadata);

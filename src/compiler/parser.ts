@@ -18,7 +18,7 @@ function findYAML(trimmedBurrito: string): { start: number, end: number } {
   return { start: match.index, end: regex.lastIndex };
 }
 
-export function parse(burrito: string): ParserOutput {
+export function extractDocumentBodyAndMetadata(burrito: string): ParserOutput {
   const trimmedBurrito = burrito.trim();
   const { start, end } = findYAML(trimmedBurrito);
   return extractYAML({ start, end, burrito: trimmedBurrito });
