@@ -1,0 +1,14 @@
+body, html {
+  height: 100%;
+}
+
+section.section {
+  padding: 24px;
+  padding-bottom: 232px;
+}
+
+.footer {
+  width: 100%;
+  position: fixed;
+  bottom: 0px;
+}

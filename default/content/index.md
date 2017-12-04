@@ -2,15 +2,16 @@
 layout: index
 ----------------------------
 
-# Welcome to the example Burrito site!
+# Welcome to the example Zircon site!
 
 This site demonstrates the basic functionality and power
-of the burrito engine.
+of the Zircon engine.
 
-It does:
-- Things
-- Other things
-- Stuff
-- Sales
+Features:
+- Handlebars template syntax
+- Markdown rendering
+- Fast
+- Simple
+- Extensible
 
-Please note this is an extremely early alpha version
+Please note Zircon is in early alpha.
