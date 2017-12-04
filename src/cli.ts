@@ -4,6 +4,8 @@ import program = require("commander");
 import fs = require("fs-extra");
 import chokidar = require("chokidar");
 import { Engine } from "./engine";
+import nodeStatic = require("node-static");
+import http = require("http");
 
 const DEFUALT_INPUT_PATH = "./";
 const DEFUALT_OUTPUT_PATH = "./site";
@@ -13,22 +15,24 @@ let didExecuteSubCommand = false;
 program
   .version(require('../package.json').version)
   .usage("[options] [input] [output]")
+  .option("-S, --skip-static", "Skip copying the static directory")
   .description("Simple static site generation");
 
 program
   .command("init <destination>")
   .description("Initialize a new site")
   .action((destination: string) => {
-    console.log("Initializing");
+    console.log("Initializing...");
     fs.copySync(__dirname + "/../example", destination);
     didExecuteSubCommand = true;
   });
 
 program
   .command("watch [input] [output]")
-  .option("-s, --skip-static", "Skip copying the static directory")
+  .option("-s, --serve [port]", "Serve the output folder on port (8080 by default)")
+  .option("-S, --skip-static", "Skip copying the static directory")
   .description("Watch the directory for file changes")
-  .action((input?: string, output?: string) => {
+  .action((input?: string, output?: string, options?: any) => {
     const outPath = output || DEFUALT_OUTPUT_PATH;
     const inputPath = input || DEFUALT_INPUT_PATH;
 
@@ -54,19 +58,29 @@ program
       });
 
     engine.generate();
+
+    if (options.serve) {
+      const port: number = typeof options.serve === "boolean" ? 8080 : options.serve;
+      const folder = new nodeStatic.Server(outPath);
+      http.createServer((req, res) => {
+        req.addListener("end", () => folder.serve(req, res)).resume();
+      }).listen(port);
+      console.log(`Server now running on http://localhost:${port}`);
+    }
+
     didExecuteSubCommand = true;
   });
 
 program
   .command("build [input] [output]")
-  .option("-s, --skip-static", "Skip copying the static directory")
-  .description("Build the burrito site")
-  .action((input?: string, output?: string) => {
+  .option("-S, --skip-static", "Skip copying the static directory")
+  .description("Build the zircon site")
+  .action((input?: string, output?: string, options?: any) => {
     console.log("Building...");
     const engine = new Engine({
       inputPath: input || DEFUALT_INPUT_PATH,
       outPath: output || DEFUALT_OUTPUT_PATH,
-      skipStatic: program.skipStatic
+      skipStatic: options.skipStatic
     });
     engine.generate();
     didExecuteSubCommand = true;
