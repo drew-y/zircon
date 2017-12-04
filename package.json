@@ -1,6 +1,6 @@
 {
-  "name": "make-burrito",
-  "version": "0.0.4",
+  "name": "zircon",
+  "version": "0.0.5",
   "description": "A simple static site generator for review oriented websites",
   "main": "dist/index.js",
   "types": "src/index.js",
