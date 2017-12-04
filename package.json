@@ -9,20 +9,20 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/youngwerth/burrito.git"
+    "url": "git+ssh://git@gitlab.com/youngwerth/zircon.git"
   },
   "keywords": [
     "cms",
-    "burrito",
+    "zircon",
     "static"
   ],
   "bin": "dist/cli.js",
   "author": "Drew Youngwerth",
   "license": "UNLICENSED",
   "bugs": {
-    "url": "https://gitlab.com/youngwerth/burrito/issues"
+    "url": "https://gitlab.com/youngwerth/zircon/issues"
   },
-  "homepage": "https://gitlab.com/youngwerth/burrito#README",
+  "homepage": "https://gitlab.com/youngwerth/zircon#README",
   "dependencies": {
     "@types/fs-extra": "^4.0.2",
     "chokidar": "^1.7.0",
