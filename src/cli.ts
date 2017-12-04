@@ -23,7 +23,7 @@ program
   .description("Initialize a new site")
   .action((destination: string) => {
     console.log("Initializing...");
-    fs.copySync(__dirname + "/../example", destination);
+    fs.copySync(__dirname + "/../default", destination);
     didExecuteSubCommand = true;
   });
 
