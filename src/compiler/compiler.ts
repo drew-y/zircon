@@ -1,25 +1,10 @@
 import Handlebars = require("handlebars");
-import Remarkable = require("remarkable");
 import hljs = require("highlight.js");
 import { extractDocumentBodyAndMetadata } from "./parser";
 import { Site, FSItem } from "../definitions";
-
-function highlight(str: string, lang: string) {
-  if (lang && hljs.getLanguage(lang)) {
-    try {
-      return hljs.highlight(lang, str).value;
-    } catch (err) {}
-  }
-
-  try {
-    return hljs.highlightAuto(str).value;
-  } catch (err) {}
-
-  return ""; // use external default escaping
-}
+import { md } from "./markdown";
 
 export class Compiler {
-  private readonly md = new Remarkable({ highlight, html: true });
   private readonly bars = Handlebars.create();
   private readonly layouts: { [name: string]: HandlebarsTemplateDelegate } = {};
 
@@ -76,7 +61,7 @@ export class Compiler {
 
     // Check to see if the file is .md if it is we need to compile the markdown
     if (item.extension === ".md") {
-      body = this.md.render(body);
+      body = md.render(body);
     }
 
     return { metadata, body };

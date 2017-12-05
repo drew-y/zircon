@@ -30,6 +30,7 @@
     "handlebars": "^4.0.10",
     "highlight.js": "^9.12.0",
     "klaw": "^2.1.0",
+    "markdown-toc": "^1.2.0",
     "node-static": "^0.7.10",
     "remarkable": "^1.7.1",
     "typescript": "^2.5.2",
