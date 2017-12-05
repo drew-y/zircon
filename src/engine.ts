@@ -115,7 +115,6 @@ export class Engine {
     fs.mkdirpSync(dir);
 
     for (const item of sitePiece.files) {
-      console.log(item);
       if (item.copyWithoutCompile) {
         fs.copySync(item.path, `${dir}/${item.base}`);
         continue;
