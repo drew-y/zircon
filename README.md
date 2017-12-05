@@ -1,4 +1,4 @@
-# <img src="docs/static/blue-gem.svg" style="width: 23px"> Zircon Static Site Generator
+# ![](docs/static/blue-gem.svg) Zircon Static Site Generator
 
 A simple static site generator with a focus on markdown and handlebars
 
