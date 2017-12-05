@@ -115,6 +115,7 @@ export class Engine {
     fs.mkdirpSync(dir);
 
     for (const item of sitePiece.files) {
+      console.log(item);
       if (item.copyWithoutCompile) {
         fs.copySync(item.path, `${dir}/${item.base}`);
         continue;
@@ -126,7 +127,7 @@ export class Engine {
           body: fs.readFileSync(item.path, "utf8")
         });
 
-        fs.writeFileSync(`${dir}/${item.name}`, body);
+        fs.writeFileSync(`${dir}/${item.name}.html`, body);
       } catch (error) {
 
         console.log(`
