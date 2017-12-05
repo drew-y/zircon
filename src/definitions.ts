@@ -1,11 +1,22 @@
 export interface Site {
+  /** Name of the site */
   name: string;
+  /** Path of the site */
   path: string;
+  /** Files inside of the site */
   files: {
+    /** Any metadata coupled with the file */
     metadata: object,
+    /** name of the file without extension */
     name: string,
-    path: string
+    /** Absolute path of item */
+    path: string,
+    /** Filename with extension */
+    base: string;
+    /** Copy the file without compiling it into a layout */
+    copyWithoutCompile?: boolean
   }[];
+  /** Subsites */
   subSites: Site[];
 }
 

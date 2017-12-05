@@ -13,7 +13,7 @@ const DEFUALT_OUTPUT_PATH = "./site";
 let didExecuteSubCommand = false;
 
 program
-  .version(require('../package.json').version)
+  .version(require("../package.json").version)
   .usage("[options] [input] [output]")
   .option("-S, --skip-static", "Skip copying the static directory")
   .description("Simple static site generation");
@@ -23,7 +23,7 @@ program
   .description("Initialize a new site")
   .action((destination: string) => {
     console.log("Initializing...");
-    fs.copySync(__dirname + "/../default", destination);
+    fs.copySync(`${__dirname}/../default`, destination);
     didExecuteSubCommand = true;
   });
 
@@ -42,11 +42,11 @@ program
     });
 
     const watcher = chokidar.watch([
-      inputPath + "content/**",
-      inputPath + "static/**",
-      inputPath + "layouts/**",
-      inputPath + "partials/**",
-      inputPath + "defaults.yml",
+      `${inputPath}content/**`,
+      `${inputPath}static/**`,
+      `${inputPath}layouts/**`,
+      `${inputPath}partials/**`,
+      `${inputPath}defaults.yml`,
     ]);
 
     watcher

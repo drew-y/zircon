@@ -7,7 +7,7 @@ export function walk(dir: string): FSItem[] {
   const dirContents = fs.readdirSync(dir);
 
   for (const item of dirContents) {
-    const location = dir + "/" + item;
+    const location = `${dir}/${item}`;
     const stats = fs.lstatSync(location);
     if (stats.isFile()) {
       const parsedPath = path.parse(item);

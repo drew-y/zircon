@@ -15,7 +15,7 @@ function highlight(str: string, lang: string) {
     return hljs.highlightAuto(str).value;
   } catch (err) {}
 
-  return ''; // use external default escaping
+  return ""; // use external default escaping
 }
 
 export class Compiler {
@@ -28,27 +28,31 @@ export class Compiler {
   }
 
   private checkLayoutExists(layoutName: string) {
-    if (!(this.layouts[layoutName] instanceof Function))
+    if (!(this.layouts[layoutName] instanceof Function)) {
       throw new Error("Layout not found");
+    }
   }
 
-  addPartial(name: string, partial: string) {
+  /** Register a handlebars partial */
+  registerPartial(name: string, partial: string) {
     this.bars.registerPartial(name, partial);
   }
 
-  addHelper(name: string, fn: Function) {
+  /** Register a handlebars helper */
+  registerHelper(name: string, fn: Function) {
     this.bars.registerHelper(name, fn);
   }
 
-  addLayout(name: string, body: string) {
-    this.layouts[name] = this.bars.compile(body)
+  /** Register a handlebars layout */
+  registerLayout(name: string, body: string) {
+    this.layouts[name] = this.bars.compile(body);
   }
 
   /**
    * Compile a document.
    * Supported formats are .hbs, .html, and markdown
    */
-  compile(opts: {
+  compileRawDocToHTML(opts: {
     document: string,
     defaults: object,
     item: FSItem
@@ -78,8 +82,12 @@ export class Compiler {
     return { metadata, body };
   }
 
-  /** Compiles a document to html */
-  compileLayout(opts: {
+  /**
+   * Takes an HTML file and compiles it
+   * with the layout specified in the metadata
+   * property.
+   */
+  compileHTMLWithLayout(opts: {
     metadata: { [key: string]: any },
     site: Site,
     body: string
