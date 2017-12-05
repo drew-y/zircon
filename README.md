@@ -40,3 +40,5 @@ http-server site
 - Handlebars helpers go in the helpers directory as `*.js`
   - Each file must export one funtion with `export =`
 - The root directory must have a defaults.yml file with at least a `layout` property defined.
+
+Gem Icon by [Twemoji](http://twitter.github.io/twemoji/)
