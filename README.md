@@ -1,4 +1,4 @@
-# <img src="docs/static/blue-gem.svg" style="width: 23px"> Zircon Static Site Generator
+# <img src="docs/static/blue-gem.png" alt="" style="width: 22px"> Zircon Static Site Generator
 
 A simple static site generator with a focus on markdown and handlebars
 
@@ -40,3 +40,5 @@ http-server site
 - Handlebars helpers go in the helpers directory as `*.js`
   - Each file must export one funtion with `export =`
 - The root directory must have a defaults.yml file with at least a `layout` property defined.
+
+Gem Icon by [Twemoji](http://twitter.github.io/twemoji/)
