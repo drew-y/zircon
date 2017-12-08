@@ -1,5 +1,4 @@
 import Handlebars = require("handlebars");
-import hljs = require("highlight.js");
 import { extractDocumentBodyAndMetadata } from "./parser";
 import { Site, FSItem } from "../definitions";
 import { md } from "./markdown";

@@ -1,4 +1,5 @@
 import Remarkable = require("remarkable");
+import hljs = require("highlight.js");
 const toc = require("markdown-toc");
 
 // Syntax highlighter function for Remarkable
