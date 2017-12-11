@@ -1,6 +1,7 @@
 #! /usr/bin/env node
 
 import program = require("commander");
+import path = require("path");
 import fs = require("fs-extra");
 import chokidar = require("chokidar");
 import { Engine } from "./engine";
@@ -11,6 +12,14 @@ const DEFUALT_INPUT_PATH = "./";
 const DEFUALT_OUTPUT_PATH = "./site";
 
 let didExecuteSubCommand = false;
+
+function resolveInputPath(input?: string): string {
+  return path.resolve(input || DEFUALT_INPUT_PATH);
+}
+
+function resolveOutputPath(output?: string): string {
+  return path.resolve(output || DEFUALT_OUTPUT_PATH);
+}
 
 program
   .version(require("../package.json").version)
@@ -33,8 +42,8 @@ program
   .option("-S, --skip-static", "Skip copying the static directory")
   .description("Watch the directory for file changes")
   .action((input?: string, output?: string, options?: any) => {
-    const outPath = output || DEFUALT_OUTPUT_PATH;
-    const inputPath = input || DEFUALT_INPUT_PATH;
+    const outPath = resolveOutputPath(output);
+    const inputPath = resolveInputPath(input);
 
     const engine = new Engine({
       inputPath, outPath,
@@ -78,8 +87,8 @@ program
   .action((input?: string, output?: string, options?: any) => {
     console.log("Building...");
     const engine = new Engine({
-      inputPath: input || DEFUALT_INPUT_PATH,
-      outPath: output || DEFUALT_OUTPUT_PATH,
+      inputPath: resolveInputPath(input),
+      outPath: resolveOutputPath(output),
       skipStatic: options.skipStatic
     });
     engine.generate();
@@ -92,8 +101,8 @@ program.parse(process.argv);
 if (!didExecuteSubCommand) {
   console.log("Building...");
   const engine = new Engine({
-    inputPath: program.args[0] || DEFUALT_INPUT_PATH,
-    outPath: program.args[1] || DEFUALT_OUTPUT_PATH,
+    inputPath: resolveInputPath(program.args[0]),
+    outPath: resolveOutputPath(program.args[1]),
     skipStatic: program.skipStatic
   });
   engine.generate();
