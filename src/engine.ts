@@ -19,7 +19,7 @@ export class Engine {
   private readonly compiler = new Compiler();
   private readonly opts: EngineOpts;
   private site: Site = newSite("", "./");
-  private defaults = {};
+  private defaults: { [key: string]: any } = {};
 
   constructor(opts: EngineOpts) {
     this.opts = opts;
