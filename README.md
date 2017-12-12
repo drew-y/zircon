@@ -100,17 +100,16 @@ zircon . ./site
 
 Final ./site:
 ```
-- content
-  - static
-    - logo.png
-  - blog
-    - exciting-news.html
-    - update-12-7-17.html
-    - first-post.html
-  - about.html
-  - support-us.html
-  - index.html
-  - favicon.ico
+- blog
+  - exciting-news.html
+  - update-12-7-17.html
+  - first-post.html
+- static
+  - logo.png
+- about.html
+- support-us.html
+- index.html
+- favicon.ico
 ```
 
 ## Layouts
