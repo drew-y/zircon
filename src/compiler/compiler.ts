@@ -3,11 +3,13 @@ import { extractDocumentBodyAndMetadata } from "./parser";
 import { Site, FSItem } from "../definitions";
 import { md } from "./markdown";
 
+type Metadata = { [key: string]: any };
+
 export class Compiler {
   private readonly bars = Handlebars.create();
   private readonly layouts: { [name: string]: HandlebarsTemplateDelegate } = {};
 
-  private mergeDefaultsWithPageMetadata(defaults: object, metadata: object): object {
+  private mergeDefaultsWithPageMetadata(defaults: Metadata, metadata: Metadata): Metadata {
     return Object.assign(metadata, defaults);
   }
 
@@ -51,6 +53,9 @@ export class Compiler {
 
     // Merge document metadata with default metadata
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
+
+    // If the document if marked as skip return an empty string as the body
+    if (metadata.skip) return { metadata, body: "" };
 
     // Just return the document if the file is already html
     if (item.extension === ".html") return { metadata, body: parsed.body };

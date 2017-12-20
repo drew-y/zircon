@@ -97,6 +97,9 @@ export class Engine {
         defaults: this.defaults, item
       });
 
+      // Skip the file if it is marked with a skip
+      if (document.metadata.skip === true) continue;
+
       // Write the document into a temp directory to be injected into it's layout later
       fs.writeFileSync(`${dir}/${item.name}.html`, document.body);
 

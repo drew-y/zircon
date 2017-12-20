@@ -224,3 +224,8 @@ For more on handlebars helpers, visit [http://handlebarsjs.com/#helpers](http://
 - `favicon.ico` and static directories defined in the root are coppied into the build directory
 
 Gem Icon by [Twemoji](http://twitter.github.io/twemoji/)
+
+# Tips
+
+- If you're not ready for a contents file to be included in the build
+simply add `skip: true` to the YAML frontmatter at the top of the page.
