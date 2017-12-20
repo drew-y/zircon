@@ -51,11 +51,11 @@ program
     });
 
     const watcher = chokidar.watch([
-      `${inputPath}content/**`,
-      `${inputPath}static/**`,
-      `${inputPath}layouts/**`,
-      `${inputPath}partials/**`,
-      `${inputPath}defaults.yml`,
+      path.resolve(inputPath, "content/**"),
+      path.resolve(inputPath, "static/**"),
+      path.resolve(inputPath, "layouts/**"),
+      path.resolve(inputPath, "partials/**"),
+      path.resolve(inputPath, "defaults.yml"),
     ]);
 
     watcher
