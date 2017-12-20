@@ -45,10 +45,12 @@ program
     const outPath = resolveOutputPath(output);
     const inputPath = resolveInputPath(input);
 
-    const engine = new Engine({
-      inputPath, outPath,
-      skipStatic: program.skipStatic
-    });
+    function createEngine() {
+      return new Engine({
+        inputPath, outPath,
+        skipStatic: program.skipStatic
+      });
+    }
 
     const watcher = chokidar.watch([
       path.resolve(inputPath, "content/**"),
@@ -64,10 +66,10 @@ program
       .on("change", path => console.log(`File ${path} has been changed`))
       .on("change", (...args: any[]) => {
         console.log("Building...");
-        engine.generate();
+        try { createEngine().generate(); } catch (e) { console.log(e); }
       });
 
-    engine.generate();
+    try { createEngine().generate(); } catch (e) { console.log(e); }
 
     if (options.serve) {
       const port: number = typeof options.serve === "boolean" ? 8080 : options.serve;
