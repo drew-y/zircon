@@ -47,7 +47,7 @@ export class Engine {
   /** Read the helpers dir. Registering each helper with handlebars */
   private readHelper(item: FSItem) {
     item.contents.forEach(helper => this.compiler.registerHelper(
-      helper.name, require(helper.path)(Handlebars)
+      helper.name, require(helper.path)
     ));
   }
 
@@ -131,15 +131,12 @@ export class Engine {
 
         fs.writeFileSync(`${dir}/${item.name}.html`, body);
       } catch (error) {
+        this.removeTempDir();
 
-        console.log(`
+        throw new Error(`
           ${item.path}
           ${error.message}
         `);
-
-        this.removeTempDir();
-
-        process.exit(0);
       }
     }
 
