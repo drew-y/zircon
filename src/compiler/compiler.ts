@@ -10,7 +10,7 @@ export class Compiler {
   private readonly layouts: { [name: string]: HandlebarsTemplateDelegate } = {};
 
   private mergeDefaultsWithPageMetadata(defaults: Metadata, metadata: Metadata): Metadata {
-    return Object.assign(metadata, defaults);
+    return Object.assign(defaults, metadata);
   }
 
   private checkLayoutExists(layoutName: string) {
