@@ -39,9 +39,20 @@ zircon . ./site
 http-server site
 ```
 
-# Guide
+# Documentation
 
-How to use Zircon. Each section documents a top level folder of a Zircon site.
+## Zircon Site Structure
+
+- [content](#content) - Folder with all site content (Required)
+- [layouts](#layouts) - Folder that holds all the layouts content can use (Required)
+- [partials](#partials) - Folder that holds handlebars partials
+- [helpers](#helpers) - Foldler that holds all handlebars helpers
+- `static` - Folder that is copied into the build
+- `favicon.ico` - The sites favicon
+- `defaults.yml` - Acts as the default info in each content frontmatter
+
+See the example in the [content](#content) section.
+
 
 ## Content
 
