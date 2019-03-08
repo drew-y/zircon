@@ -25,7 +25,7 @@ export class Compiler {
   }
 
   /** Register a handlebars helper */
-  registerHelper(name: string, fn: Function) {
+  registerHelper(name: string, fn: Handlebars.HelperDelegate) {
     this.bars.registerHelper(name, fn);
   }
 
