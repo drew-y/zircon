@@ -1,9 +1,9 @@
-import { Site } from "./definitions";
+import { SiteFolder } from "./definitions";
 
-export function newSite(name: string, path: string): Site {
+export function newSite(name: string, path: string): SiteFolder {
   return {
     name, path,
     files: [],
-    subSites: []
+    subFolders: []
   };
 }

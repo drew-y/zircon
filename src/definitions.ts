@@ -1,4 +1,4 @@
-export interface Site {
+export interface SiteFolder {
   /** Name of the site */
   name: string;
   /** Path of the site */
@@ -17,7 +17,7 @@ export interface Site {
     copyWithoutCompile?: boolean
   }[];
   /** Subsites */
-  subSites: Site[];
+  subFolders: SiteFolder[];
 }
 
 export enum FSItemType {

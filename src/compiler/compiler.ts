@@ -1,6 +1,6 @@
 import Handlebars = require("handlebars");
 import { extractDocumentBodyAndMetadata } from "./parser";
-import { Site, FSItem } from "../definitions";
+import { SiteFolder, FSItem } from "../definitions";
 import { md } from "./markdown";
 
 type Metadata = { [key: string]: any };
@@ -78,7 +78,7 @@ export class Compiler {
    */
   compileHTMLWithLayout(opts: {
     metadata: { [key: string]: any },
-    site: Site,
+    site: SiteFolder,
     body: string
   }) {
     const { metadata, body, site } = opts;

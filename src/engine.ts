@@ -3,7 +3,7 @@ import path = require("path");
 import yaml = require("js-yaml");
 import { walk } from "./loader";
 import { Compiler } from "./compiler";
-import { FSItem, FSItemType, Site } from "./definitions";
+import { FSItem, FSItemType, SiteFolder } from "./definitions";
 import { newSite } from "./helpers";
 
 const TEMP_DIR = "./temp-site";
@@ -18,7 +18,7 @@ export class Engine {
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
   private readonly opts: EngineOpts;
-  private site: Site = newSite("", "./");
+  private site: SiteFolder = newSite("", "./");
   private defaults: { [key: string]: any } = {};
 
   constructor(opts: EngineOpts) {
@@ -71,14 +71,14 @@ export class Engine {
    * compiling the raw file with helpers, and partials
    * as we go.
    */
-  private readContent(content: FSItem, dir: string = TEMP_DIR): Site {
+  private readContent(content: FSItem, dir: string = TEMP_DIR): SiteFolder {
     const site = newSite(content.name, dir);
     fs.mkdirpSync(dir);
 
     for (const item of content.contents) {
       // If the item is a directory, recursively read it.
       if (item.type === FSItemType.directory) {
-        site.subSites.push(this.readContent(item, `${dir}/${item.base}`));
+        site.subFolders.push(this.readContent(item, `${dir}/${item.base}`));
         continue;
       }
 
@@ -114,7 +114,7 @@ export class Engine {
     return site;
   }
 
-  private writeSite(sitePiece: Site, dir: string = this.opts.outPath) {
+  private writeSite(sitePiece: SiteFolder, dir: string = this.opts.outPath) {
     fs.mkdirpSync(dir);
 
     for (const item of sitePiece.files) {
@@ -140,7 +140,7 @@ export class Engine {
       }
     }
 
-    for (const item of sitePiece.subSites) {
+    for (const item of sitePiece.subFolders) {
       this.writeSite(item, `${dir}/${item.name}`);
       continue;
     }
