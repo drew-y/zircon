@@ -1,21 +1,26 @@
+
+export interface SiteFile {
+  /** Any metadata coupled with the file */
+  metadata: object,
+  /** name of the file without extension */
+  name: string,
+  /** Absolute path of item */
+  path: string,
+  /** Filename with extension */
+  base: string;
+  /** Extension of the file */
+  extension: string;
+  /** Copy the file without compiling it into a layout */
+  copyWithoutCompile?: boolean
+}
+
 export interface SiteFolder {
   /** Name of the folder */
   name: string;
   /** Path of the folder */
   path: string;
   /** Files inside of the folder */
-  files: {
-    /** Any metadata coupled with the file */
-    metadata: object,
-    /** name of the file without extension */
-    name: string,
-    /** Absolute path of item */
-    path: string,
-    /** Filename with extension */
-    base: string;
-    /** Copy the file without compiling it into a layout */
-    copyWithoutCompile?: boolean
-  }[];
+  files: SiteFile[];
   /** Subfolders */
   subFolders: SiteFolder[];
 }

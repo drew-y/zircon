@@ -5,8 +5,8 @@ import { walk } from "./loader";
 import { Compiler } from "./compiler";
 import { FSItem, FSItemType, SiteFolder } from "./definitions";
 import { newSite } from "./helpers";
+import { tmpdir } from "os";
 
-const TEMP_DIR = "./temp-site";
 const read = (path: string) => fs.readFileSync(path, "utf8");
 
 export interface EngineOpts {
@@ -19,6 +19,7 @@ export class Engine {
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
   private readonly opts: EngineOpts;
+  private readonly tempDir = `${tmpdir()}/zircon_${Date.now()}`;
   private site: SiteFolder = newSite("", "./");
   private defaults: { [key: string]: any } = {};
 
@@ -61,15 +62,16 @@ export class Engine {
 
   /** The temp directory */
   private removeTempDir() {
-    fs.remove(TEMP_DIR);
+    fs.remove(this.tempDir);
   }
 
   /**
-   * Read the content directory into a temp directory,
-   * compiling the raw file with helpers, and partials
-   * as we go.
+   * Crawl the content folder to generate the root SiteFolder.
+   * To save RAM we copy raw files without the metadata to a temp
+   * dir. Those files are later compiled with the entire SiteFolder
+   * context by the writeSite function.
    */
-  private readContent(content: FSItem, dir: string = TEMP_DIR): SiteFolder {
+  private readContent(content: FSItem, dir: string = this.tempDir): SiteFolder {
     const site = newSite(content.name, dir);
     fs.mkdirpSync(dir);
 
@@ -83,14 +85,13 @@ export class Engine {
       // If the item is not a supported format, mark it to be copied on write
       if (!this.isSupportedFile(item.extension)) {
         site.files.push({
-          metadata: {}, name: item.name, path: item.path,
-          copyWithoutCompile: true, base: item.base
+          ...item, metadata: {}, copyWithoutCompile: true,
         });
         continue;
       }
 
       // Compile the supported file into an html doc
-      const document = this.compiler.compileRawDocToHTML({
+      const document = this.compiler.extractMetadata({
         document: read(item.path),
         defaults: this.defaults, item
       });
@@ -99,13 +100,12 @@ export class Engine {
       if (document.metadata.skip === true) continue;
 
       // Write the document into a temp directory to be injected into it's layout later
-      fs.writeFileSync(`${dir}/${item.name}.html`, document.body);
+      fs.writeFileSync(`${dir}/${item.base}`, document.body);
 
       site.files.push({
+        ...item,
         metadata: document.metadata,
-        name: item.name,
-        path: `${dir}/${item.name}.html`,
-        base: item.base
+        path: `${dir}/${item.base}`
       });
     }
 
@@ -122,12 +122,15 @@ export class Engine {
       }
 
       try {
-        const body = this.compiler.compileHTMLWithLayout({
-          metadata: item.metadata, site: this.site,
-          body: read(item.path)
+        const body = this.compiler.compileSiteFile({
+          siteRoot: this.site, content: item, text: read(item.path)
+        })
+
+        const fullPage = this.compiler.insertCompiledContentIntoLayout({
+          metadata: item.metadata, site: this.site, body
         });
 
-        fs.writeFileSync(`${dir}/${item.name}.html`, body);
+        fs.writeFileSync(`${dir}/${item.name}.html`, fullPage);
       } catch (error) {
         this.removeTempDir();
 
