@@ -7,6 +7,7 @@ import { FSItem, FSItemType, SiteFolder } from "./definitions";
 import { newSite } from "./helpers";
 
 const TEMP_DIR = "./temp-site";
+const read = (path: string) => fs.readFileSync(path, "utf8");
 
 export interface EngineOpts {
   inputPath: string;
@@ -32,23 +33,20 @@ export class Engine {
 
   /** Read the layouts dir. Registering each layout with handlebars */
   private readLayout(item: FSItem) {
-    item.contents.forEach(layout => this.compiler.registerLayout(
-      layout.name, fs.readFileSync(layout.path, "utf8")
-    ));
+    item.contents.forEach(layout =>
+      this.compiler.registerLayout(layout.name, read(layout.path)));
   }
 
   /** Read the partials dir. Registering each partial with handlebars */
   private readPartial(item: FSItem) {
-    item.contents.forEach(partial => this.compiler.registerPartial(
-      partial.name, fs.readFileSync(partial.path, "utf8")
-    ));
+    item.contents.forEach(partial =>
+      this.compiler.registerPartial(partial.name, read(partial.path)));
   }
 
   /** Read the helpers dir. Registering each helper with handlebars */
   private readHelper(item: FSItem) {
-    item.contents.forEach(helper => this.compiler.registerHelper(
-      helper.name, require(helper.path)
-    ));
+    item.contents.forEach(helper =>
+      this.compiler.registerHelper(helper.name, require(helper.path)));
   }
 
   /** Copy the static directory into the outPath */
@@ -93,7 +91,7 @@ export class Engine {
 
       // Compile the supported file into an html doc
       const document = this.compiler.compileRawDocToHTML({
-        document: fs.readFileSync(item.path, "utf8"),
+        document: read(item.path),
         defaults: this.defaults, item
       });
 
@@ -126,7 +124,7 @@ export class Engine {
       try {
         const body = this.compiler.compileHTMLWithLayout({
           metadata: item.metadata, site: this.site,
-          body: fs.readFileSync(item.path, "utf8")
+          body: read(item.path)
         });
 
         fs.writeFileSync(`${dir}/${item.name}.html`, body);
@@ -151,7 +149,7 @@ export class Engine {
   private readDefaults() {
     try {
       const defaults =
-        yaml.load(fs.readFileSync(path.resolve(this.opts.inputPath, "defaults.yml"), "utf8"));
+        yaml.load(read(path.resolve(this.opts.inputPath, "defaults.yml")));
         this.defaults = defaults || {};
     } catch (e) { console.log(e) }
   }
