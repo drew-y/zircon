@@ -10,6 +10,8 @@ export interface SiteFile {
   base: string;
   /** Extension of the file */
   extension: string;
+  /** Path of the file relative to the whole site */
+  sitePath: string;
   /** Copy the file without compiling it into a layout */
   copyWithoutCompile?: boolean
 }

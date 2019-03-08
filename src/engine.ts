@@ -71,14 +71,14 @@ export class Engine {
    * dir. Those files are later compiled with the entire SiteFolder
    * context by the writeSite function.
    */
-  private readContent(content: FSItem, dir: string = this.tempDir): SiteFolder {
+  private readContent(content: FSItem, dir: string = this.tempDir, finalDir = ""): SiteFolder {
     const site = newSite(content.name, dir);
     fs.mkdirpSync(dir);
 
     for (const item of content.contents) {
       // If the item is a directory, recursively read it.
       if (item.type === FSItemType.directory) {
-        site.subFolders.push(this.readContent(item, `${dir}/${item.base}`));
+        site.subFolders.push(this.readContent(item, `${dir}/${item.base}`, `${finalDir}/${item.base}`));
         continue;
       }
 
@@ -86,6 +86,7 @@ export class Engine {
       if (!this.isSupportedFile(item.extension)) {
         site.files.push({
           ...item, metadata: {}, copyWithoutCompile: true,
+          sitePath: `${finalDir}/${item.base}`
         });
         continue;
       }
@@ -105,7 +106,8 @@ export class Engine {
       site.files.push({
         ...item,
         metadata: document.metadata,
-        path: `${dir}/${item.base}`
+        path: `${dir}/${item.base}`,
+        sitePath: `${finalDir}/${item.name}.html`
       });
     }
 
