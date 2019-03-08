@@ -68,9 +68,11 @@ Detailed Rules:
 compiler.
 
 - `.hbs and .md` Are processed by the handlebars compiler followed by the markdown
-  compiler. Any handlebars expressions are given a context containing the data in
-  the frontmatter merged with the data in the defaults.yml file along with a site
-  object describing the entire site (See SiteFolder in src/definitions.ts).
+  compiler. Any handlebars expressions are given a context containing the following
+  data:
+  - The content frontmatter data merged with the data from defaults.yaml
+  - A "root" object that decribes the entire site (see SiteFolder src/definitions.ts for interface)
+  - A "local" object that decribes the directory the content file is in. (see SiteFolder src/definitions.ts for interface)
 
 - `.hbs, .md, and .html` Are finally injected into the layout specified by either the
 front matter or the `defaults.yml` file (if layout is not defined in front matter). Once

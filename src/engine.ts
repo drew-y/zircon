@@ -123,7 +123,8 @@ export class Engine {
 
       try {
         const body = this.compiler.compileSiteFile({
-          siteRoot: this.site, content: item, text: read(item.path)
+          root: this.site, content: item, text: read(item.path),
+          local: sitePiece
         })
 
         const fullPage = this.compiler.insertCompiledContentIntoLayout({

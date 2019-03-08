@@ -57,8 +57,11 @@ export class Compiler {
     return { metadata, body: parsed.body };
   }
 
-  compileSiteFile({ siteRoot, content, text }: {
-    siteRoot: SiteFolder, content: SiteFile, text: string
+  compileSiteFile({ root, content, text, local }: {
+    root: SiteFolder,
+    local: SiteFolder,
+    content: SiteFile,
+    text: string
   }): string {
     const metadata = content.metadata
 
@@ -66,7 +69,7 @@ export class Compiler {
     if (content.extension === ".html") return text;
 
     // Compile any handlebars content within the document body
-    let body = this.bars.compile(text)({ ...metadata, site: siteRoot });
+    let body = this.bars.compile(text)({ ...metadata, root, local });
 
     // Check to see if the file is .md if it is we need to compile the markdown
     if (content.extension === ".md") {
