@@ -1,9 +1,9 @@
 export interface SiteFolder {
-  /** Name of the site */
+  /** Name of the folder */
   name: string;
-  /** Path of the site */
+  /** Path of the folder */
   path: string;
-  /** Files inside of the site */
+  /** Files inside of the folder */
   files: {
     /** Any metadata coupled with the file */
     metadata: object,
@@ -16,7 +16,7 @@ export interface SiteFolder {
     /** Copy the file without compiling it into a layout */
     copyWithoutCompile?: boolean
   }[];
-  /** Subsites */
+  /** Subfolders */
   subFolders: SiteFolder[];
 }
 
