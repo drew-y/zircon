@@ -15,6 +15,10 @@ export interface EngineOpts {
   skipStatic?: boolean;
 }
 
+/**
+ * The engine crawls a zircon site source passes the data to the compiler
+ * and writes the compiled site to the outPath.
+ */
 export class Engine {
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
