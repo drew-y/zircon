@@ -2,15 +2,17 @@
 
 A simple static site generator with a focus on markdown and handlebars
 
-- [Zircon Static Site Generator](#img-srcdocsstaticblue-gempng-alt-stylewidth-22px-zircon-static-site-generator)
+- [<img src="docs/static/blue-gem.png" alt="" style="width: 22px"/> Zircon Static Site Generator](#img-src%22docsstaticblue-gempng%22-alt%22%22-style%22width-22px%22-zircon-static-site-generator)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Guide](#guide)
+- [Documentation](#documentation)
+  - [Zircon Site Structure](#zircon-site-structure)
   - [Content](#content)
   - [Layouts](#layouts)
   - [Partials](#partials)
   - [Helpers](#helpers)
   - [Rules Overview](#rules-overview)
+- [Tips](#tips)
 
 # Installation
 
@@ -65,9 +67,10 @@ Detailed Rules:
 - `.md` files are passed through a markdown compiler, followed by the handlebars
 compiler.
 
-- `.hbs and .md` Are processed by the handlebars compiler with the context specified
-in a yaml front matter at the top of the file combined with the contents of `defualts.yml`
-(preferring properties from the front matter).
+- `.hbs and .md` Are processed by the handlebars compiler followed by the markdown
+  compiler. Any handlebars expressions are given a context containing the data in
+  the frontmatter merged with the data in the defaults.yml file along with a site
+  object describing the entire site (See SiteFolder in src/definitions.ts).
 
 - `.hbs, .md, and .html` Are finally injected into the layout specified by either the
 front matter or the `defaults.yml` file (if layout is not defined in front matter). Once
