@@ -27,7 +27,7 @@ export class Engine {
   }
 
   private isSupportedFile(extension: string) {
-    return [".html", ".md", ".md"].indexOf(extension) !== -1;
+    return [".html", ".md", ".md"].includes(extension);
   }
 
   /** Read the layouts dir. Registering each layout with handlebars */
