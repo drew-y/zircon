@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "types": "src/index.js",
   "scripts": {
+    "prepublishOnly": "tsc",
     "build": "rm -rf ./dist; tsc;"
   },
   "repository": {
@@ -24,15 +25,16 @@
   },
   "homepage": "https://gitlab.com/youngwerth/zircon#README",
   "dependencies": {
+    "@types/js-yaml": "^3.12.0",
     "chokidar": "^1.7.0",
     "commander": "^2.11.0",
     "fs-extra": "^4.0.1",
     "handlebars": "^4.0.10",
     "highlight.js": "^9.12.0",
+    "js-yaml": "^3.12.2",
     "markdown-toc": "^1.2.0",
     "node-static": "^0.7.10",
-    "remarkable": "^1.7.1",
-    "yamljs": "^0.3.0"
+    "remarkable": "^1.7.1"
   },
   "devDependencies": {
     "@types/chokidar": "^1.7.3",
@@ -43,7 +45,6 @@
     "@types/klaw": "^1.3.2",
     "@types/node": "^8.0.26",
     "@types/node-static": "^0.7.1",
-    "@types/yamljs": "^0.2.30",
-    "typescript": "^2.6.2"
+    "typescript": "^3.3.3333"
   }
 }

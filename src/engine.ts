@@ -1,7 +1,6 @@
 import fs = require("fs-extra");
-import Handlebars = require("handlebars");
 import path = require("path");
-import YAML = require("yamljs");
+import yaml = require("js-yaml");
 import { walk } from "./loader";
 import { Compiler } from "./compiler";
 import { FSItem, FSItemType, Site } from "./definitions";
@@ -152,7 +151,7 @@ export class Engine {
   private readDefaults() {
     try {
       const defaults =
-        YAML.parse(fs.readFileSync(path.resolve(this.opts.inputPath, "defaults.yml"), "utf8"));
+        yaml.load(fs.readFileSync(path.resolve(this.opts.inputPath, "defaults.yml"), "utf8"));
         this.defaults = defaults || {};
     } catch (e) { console.log(e) }
   }

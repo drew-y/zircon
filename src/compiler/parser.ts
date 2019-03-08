@@ -1,9 +1,9 @@
-import YAML = require("yamljs");
+import yaml = require("js-yaml");
 
 type ParserOutput = { metadata: object, body: string };
 
-function parseYAMLString(yaml: string): object | null {
-  return YAML.parse(yaml.replace(/-{3,}/gm, ""));
+function parseYAMLString(yamlStr: string): object | null {
+  return yaml.load(yamlStr.replace(/-{3,}/gm, ""));
 }
 
 function extractYAML(opts: { start: number, end: number, burrito: string }): ParserOutput {
