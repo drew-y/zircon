@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@gitlab.com/youngwerth/zircon.git"
+    "url": "git+ssh://git@github.com:drew-y/zircon.git"
   },
   "keywords": [
     "cms",
@@ -21,9 +21,9 @@
   "author": "Drew Youngwerth",
   "license": "MIT",
   "bugs": {
-    "url": "https://gitlab.com/youngwerth/zircon/issues"
+    "url": "https://github.com/drew-y/zircon/issues"
   },
-  "homepage": "https://gitlab.com/youngwerth/zircon#README",
+  "homepage": "https://github.com/drew-y/zircon",
   "dependencies": {
     "@types/js-yaml": "^3.12.0",
     "@types/markdown-it": "0.0.7",
