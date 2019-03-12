@@ -239,9 +239,9 @@ For more on handlebars helpers, visit [http://handlebarsjs.com/#helpers](http://
 - The root directory must have a defaults.yml file with at least a `layout` property defined.
 - `favicon.ico` and static directories defined in the root are coppied into the build directory
 
-Gem Icon by [Twemoji](http://twitter.github.io/twemoji/)
-
 # Tips
 
 - If you're not ready for a contents file to be included in the build
 simply add `skip: true` to the YAML frontmatter at the top of the page.
+
+Gem Icon by [Twemoji](http://twitter.github.io/twemoji/)
