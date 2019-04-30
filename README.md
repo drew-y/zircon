@@ -2,15 +2,17 @@
 
 A simple static site generator with a focus on markdown and handlebars
 
-- [Zircon Static Site Generator](#img-srcdocsstaticblue-gempng-alt-stylewidth-22px-zircon-static-site-generator)
+- [<img src="docs/static/blue-gem.png" alt="" style="width: 22px"/> Zircon Static Site Generator](#img-src%22docsstaticblue-gempng%22-alt%22%22-style%22width-22px%22-zircon-static-site-generator)
 - [Installation](#installation)
 - [Quick Start](#quick-start)
-- [Guide](#guide)
+- [Documentation](#documentation)
+  - [Zircon Site Structure](#zircon-site-structure)
   - [Content](#content)
   - [Layouts](#layouts)
   - [Partials](#partials)
   - [Helpers](#helpers)
   - [Rules Overview](#rules-overview)
+- [Tips](#tips)
 
 # Installation
 
@@ -65,9 +67,12 @@ Detailed Rules:
 - `.md` files are passed through a markdown compiler, followed by the handlebars
 compiler.
 
-- `.hbs and .md` Are processed by the handlebars compiler with the context specified
-in a yaml front matter at the top of the file combined with the contents of `defualts.yml`
-(preferring properties from the front matter).
+- `.hbs and .md` Are processed by the handlebars compiler followed by the markdown
+  compiler. Any handlebars expressions are given a context containing the following
+  data:
+  - The content frontmatter data merged with the data from defaults.yaml
+  - A "root" object that decribes the entire site (see SiteFolder src/definitions.ts for interface)
+  - A "local" object that decribes the directory the content file is in. (see SiteFolder src/definitions.ts for interface)
 
 - `.hbs, .md, and .html` Are finally injected into the layout specified by either the
 front matter or the `defaults.yml` file (if layout is not defined in front matter). Once
@@ -234,9 +239,9 @@ For more on handlebars helpers, visit [http://handlebarsjs.com/#helpers](http://
 - The root directory must have a defaults.yml file with at least a `layout` property defined.
 - `favicon.ico` and static directories defined in the root are coppied into the build directory
 
-Gem Icon by [Twemoji](http://twitter.github.io/twemoji/)
-
 # Tips
 
 - If you're not ready for a contents file to be included in the build
 simply add `skip: true` to the YAML frontmatter at the top of the page.
+
+Gem Icon by [Twemoji](http://twitter.github.io/twemoji/)

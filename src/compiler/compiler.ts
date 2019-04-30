@@ -1,6 +1,6 @@
 import Handlebars = require("handlebars");
 import { extractDocumentBodyAndMetadata } from "./parser";
-import { Site, FSItem } from "../definitions";
+import { SiteFolder, FSItem, SiteFile } from "../definitions";
 import { md } from "./markdown";
 
 type Metadata = { [key: string]: any };
@@ -25,7 +25,7 @@ export class Compiler {
   }
 
   /** Register a handlebars helper */
-  registerHelper(name: string, fn: Function) {
+  registerHelper(name: string, fn: Handlebars.HelperDelegate) {
     this.bars.registerHelper(name, fn);
   }
 
@@ -35,10 +35,10 @@ export class Compiler {
   }
 
   /**
-   * Compile a document.
+   * Extract metadata from
    * Supported formats are .hbs, .html, and markdown
    */
-  compileRawDocToHTML(opts: {
+  extractMetadata(opts: {
     document: string,
     defaults: object,
     item: FSItem
@@ -54,21 +54,29 @@ export class Compiler {
     // Merge document metadata with default metadata
     const metadata = this.mergeDefaultsWithPageMetadata(defaults, parsed.metadata);
 
-    // If the document if marked as skip return an empty string as the body
-    if (metadata.skip) return { metadata, body: "" };
+    return { metadata, body: parsed.body };
+  }
+
+  compileSiteFile({ root, content, text, local }: {
+    root: SiteFolder,
+    local: SiteFolder,
+    content: SiteFile,
+    text: string
+  }): string {
+    const metadata = content.metadata
 
     // Just return the document if the file is already html
-    if (item.extension === ".html") return { metadata, body: parsed.body };
+    if (content.extension === ".html") return text;
 
     // Compile any handlebars content within the document body
-    let body = this.bars.compile(parsed.body)(metadata);
+    let body = this.bars.compile(text)({ ...metadata, root, local });
 
     // Check to see if the file is .md if it is we need to compile the markdown
-    if (item.extension === ".md") {
+    if (content.extension === ".md") {
       body = md.render(body);
     }
 
-    return { metadata, body };
+    return body
   }
 
   /**
@@ -76,9 +84,9 @@ export class Compiler {
    * with the layout specified in the metadata
    * property.
    */
-  compileHTMLWithLayout(opts: {
+  insertCompiledContentIntoLayout(opts: {
     metadata: { [key: string]: any },
-    site: Site,
+    site: SiteFolder,
     body: string
   }) {
     const { metadata, body, site } = opts;

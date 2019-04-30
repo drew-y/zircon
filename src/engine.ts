@@ -3,10 +3,11 @@ import path = require("path");
 import yaml = require("js-yaml");
 import { walk } from "./loader";
 import { Compiler } from "./compiler";
-import { FSItem, FSItemType, Site } from "./definitions";
+import { FSItem, FSItemType, SiteFolder } from "./definitions";
 import { newSite } from "./helpers";
+import { tmpdir } from "os";
 
-const TEMP_DIR = "./temp-site";
+const read = (path: string) => fs.readFileSync(path, "utf8");
 
 export interface EngineOpts {
   inputPath: string;
@@ -14,11 +15,16 @@ export interface EngineOpts {
   skipStatic?: boolean;
 }
 
+/**
+ * The engine crawls a zircon site source passes the data to the compiler
+ * and writes the compiled site to the outPath.
+ */
 export class Engine {
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
   private readonly opts: EngineOpts;
-  private site: Site = newSite("", "./");
+  private readonly tempDir = `${tmpdir()}/zircon_${Date.now()}`;
+  private site: SiteFolder = newSite("", "./");
   private defaults: { [key: string]: any } = {};
 
   constructor(opts: EngineOpts) {
@@ -27,28 +33,25 @@ export class Engine {
   }
 
   private isSupportedFile(extension: string) {
-    return [".html", ".md", ".md"].indexOf(extension) !== -1;
+    return [".html", ".md", ".md"].includes(extension);
   }
 
   /** Read the layouts dir. Registering each layout with handlebars */
   private readLayout(item: FSItem) {
-    item.contents.forEach(layout => this.compiler.registerLayout(
-      layout.name, fs.readFileSync(layout.path, "utf8")
-    ));
+    item.contents.forEach(layout =>
+      this.compiler.registerLayout(layout.name, read(layout.path)));
   }
 
   /** Read the partials dir. Registering each partial with handlebars */
   private readPartial(item: FSItem) {
-    item.contents.forEach(partial => this.compiler.registerPartial(
-      partial.name, fs.readFileSync(partial.path, "utf8")
-    ));
+    item.contents.forEach(partial =>
+      this.compiler.registerPartial(partial.name, read(partial.path)));
   }
 
   /** Read the helpers dir. Registering each helper with handlebars */
   private readHelper(item: FSItem) {
-    item.contents.forEach(helper => this.compiler.registerHelper(
-      helper.name, require(helper.path)
-    ));
+    item.contents.forEach(helper =>
+      this.compiler.registerHelper(helper.name, require(helper.path)));
   }
 
   /** Copy the static directory into the outPath */
@@ -63,37 +66,38 @@ export class Engine {
 
   /** The temp directory */
   private removeTempDir() {
-    fs.remove(TEMP_DIR);
+    fs.remove(this.tempDir);
   }
 
   /**
-   * Read the content directory into a temp directory,
-   * compiling the raw file with helpers, and partials
-   * as we go.
+   * Crawl the content folder to generate the root SiteFolder.
+   * To save RAM we copy raw files without the metadata to a temp
+   * dir. Those files are later compiled with the entire SiteFolder
+   * context by the writeSite function.
    */
-  private readContent(content: FSItem, dir: string = TEMP_DIR): Site {
+  private readContent(content: FSItem, dir: string = this.tempDir, finalDir = ""): SiteFolder {
     const site = newSite(content.name, dir);
     fs.mkdirpSync(dir);
 
     for (const item of content.contents) {
       // If the item is a directory, recursively read it.
       if (item.type === FSItemType.directory) {
-        site.subSites.push(this.readContent(item, `${dir}/${item.base}`));
+        site.subFolders.push(this.readContent(item, `${dir}/${item.base}`, `${finalDir}/${item.base}`));
         continue;
       }
 
       // If the item is not a supported format, mark it to be copied on write
       if (!this.isSupportedFile(item.extension)) {
         site.files.push({
-          metadata: {}, name: item.name, path: item.path,
-          copyWithoutCompile: true, base: item.base
+          ...item, metadata: {}, copyWithoutCompile: true,
+          sitePath: `${finalDir}/${item.base}`
         });
         continue;
       }
 
       // Compile the supported file into an html doc
-      const document = this.compiler.compileRawDocToHTML({
-        document: fs.readFileSync(item.path, "utf8"),
+      const document = this.compiler.extractMetadata({
+        document: read(item.path),
         defaults: this.defaults, item
       });
 
@@ -101,20 +105,20 @@ export class Engine {
       if (document.metadata.skip === true) continue;
 
       // Write the document into a temp directory to be injected into it's layout later
-      fs.writeFileSync(`${dir}/${item.name}.html`, document.body);
+      fs.writeFileSync(`${dir}/${item.base}`, document.body);
 
       site.files.push({
+        ...item,
         metadata: document.metadata,
-        name: item.name,
-        path: `${dir}/${item.name}.html`,
-        base: item.base
+        path: `${dir}/${item.base}`,
+        sitePath: `${finalDir}/${item.name}.html`
       });
     }
 
     return site;
   }
 
-  private writeSite(sitePiece: Site, dir: string = this.opts.outPath) {
+  private writeSite(sitePiece: SiteFolder, dir: string = this.opts.outPath) {
     fs.mkdirpSync(dir);
 
     for (const item of sitePiece.files) {
@@ -124,12 +128,16 @@ export class Engine {
       }
 
       try {
-        const body = this.compiler.compileHTMLWithLayout({
-          metadata: item.metadata, site: this.site,
-          body: fs.readFileSync(item.path, "utf8")
+        const body = this.compiler.compileSiteFile({
+          root: this.site, content: item, text: read(item.path),
+          local: sitePiece
+        })
+
+        const fullPage = this.compiler.insertCompiledContentIntoLayout({
+          metadata: item.metadata, site: this.site, body
         });
 
-        fs.writeFileSync(`${dir}/${item.name}.html`, body);
+        fs.writeFileSync(`${dir}/${item.name}.html`, fullPage);
       } catch (error) {
         this.removeTempDir();
 
@@ -140,7 +148,7 @@ export class Engine {
       }
     }
 
-    for (const item of sitePiece.subSites) {
+    for (const item of sitePiece.subFolders) {
       this.writeSite(item, `${dir}/${item.name}`);
       continue;
     }
@@ -151,7 +159,7 @@ export class Engine {
   private readDefaults() {
     try {
       const defaults =
-        yaml.load(fs.readFileSync(path.resolve(this.opts.inputPath, "defaults.yml"), "utf8"));
+        yaml.load(read(path.resolve(this.opts.inputPath, "defaults.yml")));
         this.defaults = defaults || {};
     } catch (e) { console.log(e) }
   }
