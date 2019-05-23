@@ -1,11 +1,11 @@
 
 export interface SiteFile {
   /** Any metadata coupled with the file */
-  metadata: object,
+  metadata: object;
   /** name of the file without extension */
-  name: string,
+  name: string;
   /** Absolute path of item */
-  path: string,
+  path: string;
   /** Filename with extension */
   base: string;
   /** Extension of the file */
@@ -13,7 +13,7 @@ export interface SiteFile {
   /** Path of the file relative to the whole site */
   sitePath: string;
   /** Copy the file without compiling it into a layout */
-  copyWithoutCompile?: boolean
+  copyWithoutCompile?: boolean;
 }
 
 export interface SiteFolder {
