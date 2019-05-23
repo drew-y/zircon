@@ -63,7 +63,7 @@ export class Compiler {
     content: SiteFile,
     text: string
   }): string {
-    const metadata = content.metadata
+    const metadata = content.metadata;
 
     // Just return the document if the file is already html
     if (content.extension === ".html") return text;
@@ -76,7 +76,7 @@ export class Compiler {
       body = md.render(body);
     }
 
-    return body
+    return body;
   }
 
   /**

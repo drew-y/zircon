@@ -33,7 +33,7 @@ export class Engine {
   }
 
   private isSupportedFile(extension: string) {
-    return [".html", ".md", ".md"].includes(extension);
+    return [".html", ".hbs", ".md"].includes(extension);
   }
 
   /** Read the layouts dir. Registering each layout with handlebars */
@@ -131,7 +131,7 @@ export class Engine {
         const body = this.compiler.compileSiteFile({
           root: this.site, content: item, text: read(item.path),
           local: sitePiece
-        })
+        });
 
         const fullPage = this.compiler.insertCompiledContentIntoLayout({
           metadata: item.metadata, site: this.site, body
@@ -160,8 +160,8 @@ export class Engine {
     try {
       const defaults =
         yaml.load(read(path.resolve(this.opts.inputPath, "defaults.yml")));
-        this.defaults = defaults || {};
-    } catch (e) { console.log(e) }
+      this.defaults = defaults || {};
+    } catch (e) { console.log(e); }
   }
 
   private readSrcDir() {
