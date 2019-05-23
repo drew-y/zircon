@@ -1,6 +1,6 @@
 import Handlebars = require("handlebars");
 import { extractDocumentBodyAndMetadata } from "./parser";
-import { SiteFolder, FSItem, SiteFile } from "../definitions";
+import { HandlebarsLayoutContext, HandlebarsContentContext } from "../definitions";
 import { md } from "./markdown";
 
 type Metadata = { [key: string]: any };
@@ -41,12 +41,11 @@ export class Compiler {
   extractMetadata(opts: {
     document: string,
     defaults: object,
-    item: FSItem
   }): {
     metadata: { [key: string]: any },
     body: string
   } {
-    const { document, defaults, item } = opts;
+    const { document, defaults } = opts;
 
     // Extract document body and metadata
     const parsed = extractDocumentBodyAndMetadata(document);
@@ -57,26 +56,21 @@ export class Compiler {
     return { metadata, body: parsed.body };
   }
 
-  compileSiteFile({ root, content, text, local }: {
-    root: SiteFolder,
-    local: SiteFolder,
-    content: SiteFile,
-    text: string
+  compileSiteFile({ extension, text, context }: {
+    extension: string,
+    text: string,
+    context: HandlebarsContentContext
   }): string {
-    const metadata = content.metadata;
-
-    // Just return the document if the file is already html
-    if (content.extension === ".html") return text;
-
-    // Compile any handlebars content within the document body
-    let body = this.bars.compile(text)({ ...metadata, root, local });
-
-    // Check to see if the file is .md if it is we need to compile the markdown
-    if (content.extension === ".md") {
-      body = md.render(body);
+    if (extension === ".md") {
+      const hbs = md.render(text);
+      return this.bars.compile(hbs)(context);
     }
 
-    return body;
+    if (extension === ".hbs") {
+      return this.bars.compile(text)(context);
+    }
+
+    return text;
   }
 
   /**
@@ -84,15 +78,8 @@ export class Compiler {
    * with the layout specified in the metadata
    * property.
    */
-  insertCompiledContentIntoLayout(opts: {
-    metadata: { [key: string]: any },
-    site: SiteFolder,
-    body: string
-  }) {
-    const { metadata, body, site } = opts;
-    this.checkLayoutExists(metadata.layout);
-    return this.layouts[metadata.layout]({
-      content: body, metadata, site
-    });
+  insertCompiledContentIntoLayout(context: HandlebarsLayoutContext) {
+    this.checkLayoutExists(context.metadata.layout);
+    return this.layouts[context.metadata.layout](context);
   }
 }

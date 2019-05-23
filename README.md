@@ -12,6 +12,7 @@ A simple static site generator with a focus on markdown and handlebars
   - [Partials](#partials)
   - [Helpers](#helpers)
   - [Rules Overview](#rules-overview)
+  - [Contexts](#contexts)
 - [Tips](#tips)
 
 # Installation
@@ -130,43 +131,10 @@ Final ./site:
 
 ## Layouts
 
-The layouts directory is where top level layouts live. All layouts are *.hbs files.
-Each page in the contents directoy is rendered with a layout specified in the front
-matter or the defaults.yml file using the layout filename (without its extension).
-
-The layout has access to a context with the following properties:
-
-- `content` - The final rendered html of a content file
-- `site` - A site object that outlines the structure of the entire site
-
-  The site object adheres to the following interface:
-  ```typescript
-  export interface Site {
-    /** Name of the site */
-    name: string;
-    /** Path of the site */
-    path: string;
-    /** Files inside of the site */
-    files: {
-      /** Any metadata coupled with the file */
-      metadata: object,
-      /** name of the file without extension */
-      name: string,
-      /** Absolute path of item */
-      path: string,
-      /** Filename with extension */
-      base: string;
-      /** Copy the file without compiling it into a layout */
-      copyWithoutCompile?: boolean
-    }[];
-    /** Subsites */
-    subSites: Site[];
-  }
-  ```
-
-- `metadata` - Any metadata packaged with the content front matter or defaults.yml
-
-Layouts also have access to all partials defined in the partials directory.
+Layouts are handlebars files that define the layout of your content. They live
+in the top level layouts folder. Every layout is passed a context with a
+`content` property. This property contains the text content of the page the
+layout is being used to render.
 
 To learn more about the *.hbs (Handlebars) file syntax, visit [http://handlebarsjs.com/](http://handlebarsjs.com/).
 
@@ -224,6 +192,8 @@ The file is automatically registered with handlebars and can be accessed with it
 <article>
 ```
 
+Like partials, helpers can be accessed from both layouts and content files.
+
 For more on handlebars helpers, visit [http://handlebarsjs.com/#helpers](http://handlebarsjs.com/#helpers).
 
 ## Rules Overview
@@ -238,6 +208,55 @@ For more on handlebars helpers, visit [http://handlebarsjs.com/#helpers](http://
   - Each file must export one funtion with `export =`
 - The root directory must have a defaults.yml file with at least a `layout` property defined.
 - `favicon.ico` and static directories defined in the root are coppied into the build directory
+
+## Contexts
+
+Layouts and Content have access to handlebars contexts with the following
+interface:
+
+```typescript
+export interface HandlebarsFolderContext {
+  name: string;
+  path: string;
+  subfolders: HandlebarsFolderContext[];
+  pages: {
+    path: string,
+    text: string,
+    metadata: { [key: string]: any };
+  }[];
+}
+
+export interface HandlebarsContentContext {
+  /** Metadata from the page frontmatter merged with defaults */
+  metadata: { [key: string]: any };
+
+  /** Path of the current page */
+  path: string;
+
+  /** Folder containing the current page */
+  folder: HandlebarsFolderContext;
+
+  /** The entire site */
+  site: HandlebarsFolderContext;
+}
+
+export interface HandlebarsLayoutContext {
+  /** Metadata from the page frontmatter merged with defaults */
+  metadata: { [key: string]: any };
+
+  /** Path of the current page */
+  path: string;
+
+  /** Content for the layout to display */
+  content: string;
+
+  /** Folder containing the current page */
+  folder: HandlebarsFolderContext;
+
+  /** The entire site */
+  site: HandlebarsFolderContext;
+}
+```
 
 # Tips
 

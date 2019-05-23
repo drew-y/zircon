@@ -7,13 +7,15 @@ export interface SiteFile {
   /** Absolute path of item */
   path: string;
   /** Filename with extension */
-  base: string;
+  fullname: string;
   /** Extension of the file */
   extension: string;
-  /** Path of the file relative to the whole site */
-  sitePath: string;
+  /** Text content of the file without frontmatter */
+  text: string;
   /** Copy the file without compiling it into a layout */
   copyWithoutCompile?: boolean;
+  /** Path of the original file */
+  sourcePath: string;
 }
 
 export interface SiteFolder {
@@ -24,7 +26,49 @@ export interface SiteFolder {
   /** Files inside of the folder */
   files: SiteFile[];
   /** Subfolders */
-  subFolders: SiteFolder[];
+  subfolders: SiteFolder[];
+}
+
+export interface HandlebarsFolderContext {
+  name: string;
+  path: string;
+  subfolders: HandlebarsFolderContext[];
+  pages: {
+    path: string,
+    text: string,
+    metadata: { [key: string]: any };
+  }[];
+}
+
+export interface HandlebarsContentContext {
+  /** Metadata from the page frontmatter merged with defaults */
+  metadata: { [key: string]: any };
+
+  /** Path of the current page */
+  path: string;
+
+  /** Folder containing the current page */
+  folder: HandlebarsFolderContext;
+
+  /** The entire site */
+  site: HandlebarsFolderContext;
+}
+
+export interface HandlebarsLayoutContext {
+  /** Metadata from the page frontmatter merged with defaults */
+  metadata: { [key: string]: any };
+
+  /** Path of the current page */
+  path: string;
+
+  /** Content for the layout to display */
+  content: string;
+
+  /** Folder containing the current page */
+  folder: HandlebarsFolderContext;
+
+  /** The entire site */
+  site: HandlebarsFolderContext;
 }
 
 export enum FSItemType {
@@ -42,7 +86,7 @@ export interface FSItem {
   /** Absolute path of item */
   path: string;
   /** Filename with extension */
-  base: string;
+  fullname: string;
   /** If the item is a directory contents holds more FSItems */
   contents: FSItem[];
 }

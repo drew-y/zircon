@@ -3,9 +3,8 @@ import path = require("path");
 import yaml = require("js-yaml");
 import { walk } from "./loader";
 import { Compiler } from "./compiler";
-import { FSItem, FSItemType, SiteFolder } from "./definitions";
+import { FSItem, FSItemType, SiteFolder, HandlebarsContentContext, HandlebarsFolderContext } from "./definitions";
 import { newSite } from "./helpers";
-import { tmpdir } from "os";
 
 const read = (path: string) => fs.readFileSync(path, "utf8");
 
@@ -23,7 +22,6 @@ export class Engine {
   private readonly dir: FSItem[];
   private readonly compiler = new Compiler();
   private readonly opts: EngineOpts;
-  private readonly tempDir = `${tmpdir()}/zircon_${Date.now()}`;
   private site: SiteFolder = newSite("", "./");
   private defaults: { [key: string]: any } = {};
 
@@ -61,12 +59,7 @@ export class Engine {
 
   /** Copy a favicon directory into the outPath */
   private copyFavicon(item: FSItem) {
-    fs.copySync(item.path, `${this.opts.outPath}/${item.base}`);
-  }
-
-  /** The temp directory */
-  private removeTempDir() {
-    fs.remove(this.tempDir);
+    fs.copySync(item.path, `${this.opts.outPath}/${item.fullname}`);
   }
 
   /**
@@ -75,72 +68,99 @@ export class Engine {
    * dir. Those files are later compiled with the entire SiteFolder
    * context by the writeSite function.
    */
-  private readContent(content: FSItem, dir: string = this.tempDir, finalDir = ""): SiteFolder {
+  private readContent(content: FSItem, dir: string = this.opts.outPath): SiteFolder {
     const site = newSite(content.name, dir);
-    fs.mkdirpSync(dir);
 
     for (const item of content.contents) {
+      const path = `${dir}/${item.fullname}`;
       // If the item is a directory, recursively read it.
       if (item.type === FSItemType.directory) {
-        site.subFolders.push(this.readContent(item, `${dir}/${item.base}`, `${finalDir}/${item.base}`));
+        site.subfolders.push(this.readContent(item, path));
         continue;
       }
 
       // If the item is not a supported format, mark it to be copied on write
       if (!this.isSupportedFile(item.extension)) {
         site.files.push({
-          ...item, metadata: {}, copyWithoutCompile: true,
-          sitePath: `${finalDir}/${item.base}`
+          metadata: {},
+          copyWithoutCompile: true,
+          text: "",
+          name: item.name,
+          fullname: item.fullname,
+          path,
+          sourcePath: item.path,
+          extension: item.extension
         });
         continue;
       }
 
-      // Compile the supported file into an html doc
+      // Extract the metadata from the file
       const document = this.compiler.extractMetadata({
         document: read(item.path),
-        defaults: this.defaults, item
+        defaults: this.defaults
       });
 
       // Skip the file if it is marked with a skip
       if (document.metadata.skip === true) continue;
 
-      // Write the document into a temp directory to be injected into it's layout later
-      fs.writeFileSync(`${dir}/${item.base}`, document.body);
-
       site.files.push({
-        ...item,
         metadata: document.metadata,
-        path: `${dir}/${item.base}`,
-        sitePath: `${finalDir}/${item.name}.html`
+        text: document.body,
+        name: item.name,
+        fullname: item.fullname,
+        path,
+        sourcePath: item.path,
+        extension: item.extension
       });
     }
 
     return site;
   }
 
-  private writeSite(sitePiece: SiteFolder, dir: string = this.opts.outPath) {
+  private genContext(folder: SiteFolder, dir: string = this.opts.outPath): HandlebarsFolderContext {
+    const pages = folder.files
+      .map(item => ({ path: item.path, metadata: item.metadata, text: item.text }));
+    const subfolders = folder.subfolders
+      .map(item => this.genContext(item, item.path));
+    return {
+      name: folder.name,
+      path: folder.name,
+      pages, subfolders
+    };
+  }
+
+  private writeSite(
+    folder: SiteFolder,
+    siteContext: HandlebarsFolderContext,
+    dir: string = this.opts.outPath
+  ) {
     fs.mkdirpSync(dir);
 
-    for (const item of sitePiece.files) {
+    for (const item of folder.files) {
       if (item.copyWithoutCompile) {
-        fs.copySync(item.path, `${dir}/${item.base}`);
+        fs.copySync(item.sourcePath, item.path);
         continue;
       }
 
       try {
-        const body = this.compiler.compileSiteFile({
-          root: this.site, content: item, text: read(item.path),
-          local: sitePiece
+        const context = {
+          metadata: item.metadata,
+          path: item.path,
+          folder: this.genContext(folder),
+          site: siteContext
+        };
+
+        const content = this.compiler.compileSiteFile({
+          text: item.text,
+          extension: item.extension,
+          context
         });
 
-        const fullPage = this.compiler.insertCompiledContentIntoLayout({
-          metadata: item.metadata, site: this.site, body
-        });
+        const fullPage =
+          this.compiler.insertCompiledContentIntoLayout({ ...context, content });
 
         fs.writeFileSync(`${dir}/${item.name}.html`, fullPage);
       } catch (error) {
-        this.removeTempDir();
-
         throw new Error(`
           ${item.path}
           ${error.message}
@@ -148,12 +168,12 @@ export class Engine {
       }
     }
 
-    for (const item of sitePiece.subFolders) {
-      this.writeSite(item, `${dir}/${item.name}`);
+    for (const item of folder.subfolders) {
+      this.writeSite(item, siteContext, `${dir}/${item.name}`);
       continue;
     }
 
-    return sitePiece;
+    return folder;
   }
 
   private readDefaults() {
@@ -195,7 +215,7 @@ export class Engine {
     fs.mkdirpSync(this.opts.outPath);
     this.readDefaults();
     this.readSrcDir();
-    this.writeSite(this.site);
-    this.removeTempDir();
+    const siteContext = this.genContext(this.site);
+    this.writeSite(this.site, siteContext);
   }
 }
