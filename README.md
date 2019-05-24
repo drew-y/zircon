@@ -217,11 +217,14 @@ interface:
 ```typescript
 export interface HandlebarsFolderContext {
   name: string;
+  absolutePath: string;
+  /** Path relative to the root of the page */
   path: string;
   subfolders: HandlebarsFolderContext[];
   pages: {
     path: string,
     text: string,
+    extension: string,
     metadata: { [key: string]: any };
   }[];
 }
@@ -231,30 +234,30 @@ export interface HandlebarsContentContext {
   metadata: { [key: string]: any };
 
   /** Path of the current page */
-  path: string;
+  absolutePath: string;
 
   /** Folder containing the current page */
   folder: HandlebarsFolderContext;
+
+  /** filename with extension */
+  filename: string;
+
+  /** Path relative to the root of the page */
+  path: string;
+
+  /** Original unmodified text of the content file */
+  text: string;
+
+  /** Original unmodified extension of the content file */
+  extension: string;
 
   /** The entire site */
   site: HandlebarsFolderContext;
 }
 
-export interface HandlebarsLayoutContext {
-  /** Metadata from the page frontmatter merged with defaults */
-  metadata: { [key: string]: any };
-
-  /** Path of the current page */
-  path: string;
-
+export interface HandlebarsLayoutContext extends HandlebarsContentContext {
   /** Content for the layout to display */
   content: string;
-
-  /** Folder containing the current page */
-  folder: HandlebarsFolderContext;
-
-  /** The entire site */
-  site: HandlebarsFolderContext;
 }
 ```
 

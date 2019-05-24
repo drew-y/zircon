@@ -5,9 +5,9 @@ export interface SiteFile {
   /** name of the file without extension */
   name: string;
   /** Absolute path of item */
-  path: string;
+  absolutePath: string;
   /** Filename with extension */
-  fullname: string;
+  filename: string;
   /** Extension of the file */
   extension: string;
   /** Text content of the file without frontmatter */
@@ -22,7 +22,7 @@ export interface SiteFolder {
   /** Name of the folder */
   name: string;
   /** Path of the folder */
-  path: string;
+  absolutePath: string;
   /** Files inside of the folder */
   files: SiteFile[];
   /** Subfolders */
@@ -31,11 +31,14 @@ export interface SiteFolder {
 
 export interface HandlebarsFolderContext {
   name: string;
+  absolutePath: string;
+  /** Path relative to the root of the page */
   path: string;
   subfolders: HandlebarsFolderContext[];
   pages: {
     path: string,
     text: string,
+    extension: string,
     metadata: { [key: string]: any };
   }[];
 }
@@ -45,30 +48,30 @@ export interface HandlebarsContentContext {
   metadata: { [key: string]: any };
 
   /** Path of the current page */
-  path: string;
+  absolutePath: string;
 
   /** Folder containing the current page */
   folder: HandlebarsFolderContext;
+
+  /** filename with extension */
+  filename: string;
+
+  /** Path relative to the root of the page */
+  path: string;
+
+  /** Original unmodified text of the content file */
+  text: string;
+
+  /** Original unmodified extension of the content file */
+  extension: string;
 
   /** The entire site */
   site: HandlebarsFolderContext;
 }
 
-export interface HandlebarsLayoutContext {
-  /** Metadata from the page frontmatter merged with defaults */
-  metadata: { [key: string]: any };
-
-  /** Path of the current page */
-  path: string;
-
+export interface HandlebarsLayoutContext extends HandlebarsContentContext {
   /** Content for the layout to display */
   content: string;
-
-  /** Folder containing the current page */
-  folder: HandlebarsFolderContext;
-
-  /** The entire site */
-  site: HandlebarsFolderContext;
 }
 
 export enum FSItemType {

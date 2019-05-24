@@ -86,8 +86,8 @@ export class Engine {
           copyWithoutCompile: true,
           text: "",
           name: item.name,
-          fullname: item.fullname,
-          path,
+          filename: item.fullname,
+          absolutePath: path,
           sourcePath: item.path,
           extension: item.extension
         });
@@ -107,8 +107,8 @@ export class Engine {
         metadata: document.metadata,
         text: document.body,
         name: item.name,
-        fullname: item.fullname,
-        path,
+        filename: item.fullname,
+        absolutePath: path,
         sourcePath: item.path,
         extension: item.extension
       });
@@ -117,14 +117,20 @@ export class Engine {
     return site;
   }
 
-  private genContext(folder: SiteFolder, dir: string = this.opts.outPath): HandlebarsFolderContext {
+  private genContext(folder: SiteFolder): HandlebarsFolderContext {
     const pages = folder.files
-      .map(item => ({ path: item.path, metadata: item.metadata, text: item.text }));
+      .map(item => ({
+        path: item.absolutePath.replace(this.opts.outPath, ""),
+        metadata: item.metadata,
+        text: item.text,
+        extension: item.extension
+      }));
     const subfolders = folder.subfolders
-      .map(item => this.genContext(item, item.path));
+      .map(item => this.genContext(item));
     return {
       name: folder.name,
-      path: folder.name,
+      absolutePath: folder.absolutePath,
+      path: folder.absolutePath.replace(this.opts.outPath, ""),
       pages, subfolders
     };
   }
@@ -138,23 +144,23 @@ export class Engine {
 
     for (const item of folder.files) {
       if (item.copyWithoutCompile) {
-        fs.copySync(item.sourcePath, item.path);
+        fs.copySync(item.sourcePath, item.absolutePath);
         continue;
       }
 
       try {
         const context = {
           metadata: item.metadata,
-          path: item.path,
+          absolutePath: item.absolutePath,
+          filename: `${item.name}.html`,
+          path: item.absolutePath.replace(this.opts.outPath, ""),
           folder: this.genContext(folder),
-          site: siteContext
+          site: siteContext,
+          text: item.text,
+          extension: item.extension
         };
 
-        const content = this.compiler.compileSiteFile({
-          text: item.text,
-          extension: item.extension,
-          context
-        });
+        const content = this.compiler.compileSiteFile(context);
 
         const fullPage =
           this.compiler.insertCompiledContentIntoLayout({ ...context, content });
@@ -162,7 +168,7 @@ export class Engine {
         fs.writeFileSync(`${dir}/${item.name}.html`, fullPage);
       } catch (error) {
         throw new Error(`
-          ${item.path}
+          ${item.absolutePath}
           ${error.message}
         `);
       }
