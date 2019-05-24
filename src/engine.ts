@@ -3,8 +3,9 @@ import path = require("path");
 import yaml = require("js-yaml");
 import { walk } from "./loader";
 import { Compiler } from "./compiler";
-import { FSItem, FSItemType, SiteFolder, HandlebarsContentContext, HandlebarsFolderContext } from "./definitions";
+import { FSItem, FSItemType, SiteFolder, HandlebarsFolderContext } from "./definitions";
 import { newSite } from "./helpers";
+import { tmpdir } from "os";
 
 const read = (path: string) => fs.readFileSync(path, "utf8");
 
@@ -23,11 +24,17 @@ export class Engine {
   private readonly compiler = new Compiler();
   private readonly opts: EngineOpts;
   private site: SiteFolder = newSite("", "./");
+  private readonly tempDir = `${tmpdir()}/zircon_${Date.now()}`;
   private defaults: { [key: string]: any } = {};
 
   constructor(opts: EngineOpts) {
     this.opts = opts;
     this.dir = walk(opts.inputPath);
+  }
+
+  /** The temp directory */
+  private removeTempDir() {
+    fs.remove(this.tempDir);
   }
 
   private isSupportedFile(extension: string) {
@@ -59,7 +66,7 @@ export class Engine {
 
   /** Copy a favicon directory into the outPath */
   private copyFavicon(item: FSItem) {
-    fs.copySync(item.path, `${this.opts.outPath}/${item.fullname}`);
+    fs.copySync(item.path, `${this.opts.outPath}/${item.filename}`);
   }
 
   /**
@@ -68,14 +75,20 @@ export class Engine {
    * dir. Those files are later compiled with the entire SiteFolder
    * context by the writeSite function.
    */
-  private readContent(content: FSItem, dir: string = this.opts.outPath): SiteFolder {
+  private readContent(
+    content: FSItem,
+    dir: string = this.opts.outPath,
+    tempDir = this.tempDir
+  ): SiteFolder {
     const site = newSite(content.name, dir);
+    fs.mkdirpSync(tempDir);
 
     for (const item of content.contents) {
-      const path = `${dir}/${item.fullname}`;
+      const path = `${dir}/${item.filename}`;
+      const tempPath = `${tempDir}/${item.filename}`;
       // If the item is a directory, recursively read it.
       if (item.type === FSItemType.directory) {
-        site.subfolders.push(this.readContent(item, path));
+        site.subfolders.push(this.readContent(item, path, tempPath));
         continue;
       }
 
@@ -84,9 +97,9 @@ export class Engine {
         site.files.push({
           metadata: {},
           copyWithoutCompile: true,
-          text: "",
+          extractedTextPath: "",
           name: item.name,
-          filename: item.fullname,
+          filename: item.filename,
           absolutePath: path,
           sourcePath: item.path,
           extension: item.extension
@@ -103,11 +116,14 @@ export class Engine {
       // Skip the file if it is marked with a skip
       if (document.metadata.skip === true) continue;
 
+      // Write the document into a temp directory to be injected into it's layout later
+      fs.writeFileSync(tempPath, document.body);
+
       site.files.push({
         metadata: document.metadata,
-        text: document.body,
+        extractedTextPath: tempPath,
         name: item.name,
-        filename: item.fullname,
+        filename: item.filename,
         absolutePath: path,
         sourcePath: item.path,
         extension: item.extension
@@ -122,7 +138,7 @@ export class Engine {
       .map(item => ({
         path: item.absolutePath.replace(this.opts.outPath, ""),
         metadata: item.metadata,
-        text: item.text,
+        extractedTextPath: item.extractedTextPath,
         extension: item.extension
       }));
     const subfolders = folder.subfolders
@@ -156,17 +172,20 @@ export class Engine {
           path: item.absolutePath.replace(this.opts.outPath, ""),
           folder: this.genContext(folder),
           site: siteContext,
-          text: item.text,
+          extractedTextPath: item.extractedTextPath,
           extension: item.extension
         };
 
-        const content = this.compiler.compileSiteFile(context);
+        const text = read(item.extractedTextPath);
+        const content = this.compiler.compileSiteFile(text, context);
 
         const fullPage =
           this.compiler.insertCompiledContentIntoLayout({ ...context, content });
 
         fs.writeFileSync(`${dir}/${item.name}.html`, fullPage);
       } catch (error) {
+        this.removeTempDir();
+
         throw new Error(`
           ${item.absolutePath}
           ${error.message}
@@ -223,5 +242,6 @@ export class Engine {
     this.readSrcDir();
     const siteContext = this.genContext(this.site);
     this.writeSite(this.site, siteContext);
+    this.removeTempDir();
   }
 }

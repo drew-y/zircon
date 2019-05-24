@@ -13,7 +13,7 @@ export function walk(dir: string): FSItem[] {
       const parsedPath = path.parse(item);
       fsItems.push({
         type: FSItemType.file,
-        fullname: item,
+        filename: item,
         name: parsedPath.name,
         extension: parsedPath.ext,
         path: path.resolve(location),
@@ -26,7 +26,7 @@ export function walk(dir: string): FSItem[] {
       const parsedPath = path.parse(item);
       fsItems.push({
         type: FSItemType.directory,
-        fullname: item,
+        filename: item,
         name: parsedPath.name,
         extension: parsedPath.ext,
         path: path.resolve(location),

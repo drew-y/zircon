@@ -56,17 +56,17 @@ export class Compiler {
     return { metadata, body: parsed.body };
   }
 
-  compileSiteFile(context: HandlebarsContentContext): string {
+  compileSiteFile(text: string, context: HandlebarsContentContext): string {
     if (context.extension === ".md") {
-      const hbs = md.render(context.text);
+      const hbs = md.render(text);
       return this.bars.compile(hbs)(context);
     }
 
     if (context.extension === ".hbs") {
-      return this.bars.compile(context.text)(context);
+      return this.bars.compile(text)(context);
     }
 
-    return context.text;
+    return text;
   }
 
   /**

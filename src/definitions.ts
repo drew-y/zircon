@@ -10,8 +10,8 @@ export interface SiteFile {
   filename: string;
   /** Extension of the file */
   extension: string;
-  /** Text content of the file without frontmatter */
-  text: string;
+  /** Absolute path to text content of the file without frontmatter */
+  extractedTextPath: string;
   /** Copy the file without compiling it into a layout */
   copyWithoutCompile?: boolean;
   /** Path of the original file */
@@ -37,7 +37,8 @@ export interface HandlebarsFolderContext {
   subfolders: HandlebarsFolderContext[];
   pages: {
     path: string,
-    text: string,
+    /** Absolute path to text content of the file without frontmatter */
+    extractedTextPath: string,
     extension: string,
     metadata: { [key: string]: any };
   }[];
@@ -59,8 +60,8 @@ export interface HandlebarsContentContext {
   /** Path relative to the root of the page */
   path: string;
 
-  /** Original unmodified text of the content file */
-  text: string;
+  /** Absolute path to text content of the file without frontmatter */
+  extractedTextPath: string;
 
   /** Original unmodified extension of the content file */
   extension: string;
@@ -89,7 +90,7 @@ export interface FSItem {
   /** Absolute path of item */
   path: string;
   /** Filename with extension */
-  fullname: string;
+  filename: string;
   /** If the item is a directory contents holds more FSItems */
   contents: FSItem[];
 }

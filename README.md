@@ -159,7 +159,7 @@ Each helpers file should export a single function like this:
 ```javascript
 // currentDate.js
 
-export = function currentDate() {
+module.exports = function currentDate() {
   const date = new Date();
 
   const months = [
@@ -223,7 +223,8 @@ export interface HandlebarsFolderContext {
   subfolders: HandlebarsFolderContext[];
   pages: {
     path: string,
-    text: string,
+    /** Absolute path to text content of the file without frontmatter */
+    extractedTextPath: string,
     extension: string,
     metadata: { [key: string]: any };
   }[];
@@ -245,8 +246,8 @@ export interface HandlebarsContentContext {
   /** Path relative to the root of the page */
   path: string;
 
-  /** Original unmodified text of the content file */
-  text: string;
+  /** Absolute path to text content of the file without frontmatter */
+  extractedTextPath: string;
 
   /** Original unmodified extension of the content file */
   extension: string;
