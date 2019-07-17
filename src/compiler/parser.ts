@@ -8,11 +8,11 @@ function parseYAMLString(yamlStr: string): object | null {
 
 function extractYAML(opts: { start: number, end: number, burrito: string }): ParserOutput {
   const metadata = parseYAMLString(opts.burrito.slice(opts.start, opts.end));
-  return { body: opts.burrito.slice(opts.end).trim(), metadata: (metadata ? metadata : { }) };
+  return { body: opts.burrito.slice(opts.end).trim(), metadata: (metadata ? metadata : {}) };
 }
 
 function findYAML(trimmedBurrito: string): { start: number, end: number } {
-  const regex = /^-{3,}[^-]+-{3,}/g;
+  const regex = /^-{3,}(.|\n)*-{3,}/g;
   const match = regex.exec(trimmedBurrito);
   if (!match) return { start: 0, end: 0 };
   return { start: match.index, end: regex.lastIndex };
