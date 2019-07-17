@@ -8,7 +8,7 @@ export interface SiteFile {
   absolutePath: string;
   /** Filename with extension */
   filename: string;
-  /** Extension of the file */
+  /** Extension of the original file */
   extension: string;
   /** Absolute path to text content of the file without frontmatter */
   extractedTextPath: string;
@@ -39,6 +39,7 @@ export interface HandlebarsFolderContext {
     path: string,
     /** Absolute path to text content of the file without frontmatter */
     extractedTextPath: string,
+    /** Extension of the original file */
     extension: string,
     metadata: { [key: string]: any };
   }[];

@@ -124,7 +124,7 @@ export class Engine {
         extractedTextPath: tempPath,
         name: item.name,
         filename: item.filename,
-        absolutePath: path,
+        absolutePath: `${path.substr(0, path.lastIndexOf("."))}.html`,
         sourcePath: item.path,
         extension: item.extension
       });
@@ -151,12 +151,13 @@ export class Engine {
     };
   }
 
-  private writeSite(
+  private writeSiteFolder(
     folder: SiteFolder,
     siteContext: HandlebarsFolderContext,
     dir: string = this.opts.outPath
   ) {
     fs.mkdirpSync(dir);
+    const folderContext = this.genContext(folder);
 
     for (const item of folder.files) {
       if (item.copyWithoutCompile) {
@@ -170,7 +171,7 @@ export class Engine {
           absolutePath: item.absolutePath,
           filename: `${item.name}.html`,
           path: item.absolutePath.replace(this.opts.outPath, ""),
-          folder: this.genContext(folder),
+          folder: folderContext,
           site: siteContext,
           extractedTextPath: item.extractedTextPath,
           extension: item.extension
@@ -194,7 +195,7 @@ export class Engine {
     }
 
     for (const item of folder.subfolders) {
-      this.writeSite(item, siteContext, `${dir}/${item.name}`);
+      this.writeSiteFolder(item, siteContext, `${dir}/${item.name}`);
       continue;
     }
 
@@ -241,7 +242,7 @@ export class Engine {
     this.readDefaults();
     this.readSrcDir();
     const siteContext = this.genContext(this.site);
-    this.writeSite(this.site, siteContext);
+    this.writeSiteFolder(this.site, siteContext);
     this.removeTempDir();
   }
 }

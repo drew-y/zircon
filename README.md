@@ -2,18 +2,18 @@
 
 A simple static site generator with a focus on markdown and handlebars
 
-- [<img src="docs/static/blue-gem.png" alt="" style="width: 22px"/> Zircon Static Site Generator](#img-src%22docsstaticblue-gempng%22-alt%22%22-style%22width-22px%22-zircon-static-site-generator)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Documentation](#documentation)
-  - [Zircon Site Structure](#zircon-site-structure)
-  - [Content](#content)
-  - [Layouts](#layouts)
-  - [Partials](#partials)
-  - [Helpers](#helpers)
-  - [Rules Overview](#rules-overview)
-  - [Contexts](#contexts)
-- [Tips](#tips)
+- [<img src="docs/static/blue-gem.png" alt="" style="width: 22px"/> Zircon Static Site Generator](#img-src%22docsstaticblue-gempng%22-alt%22%22-style%22width-22px%22-Zircon-Static-Site-Generator)
+- [Installation](#Installation)
+- [Quick Start](#Quick-Start)
+- [Documentation](#Documentation)
+  - [Zircon Site Structure](#Zircon-Site-Structure)
+  - [Content](#Content)
+  - [Layouts](#Layouts)
+  - [Partials](#Partials)
+  - [Helpers](#Helpers)
+  - [Rules Overview](#Rules-Overview)
+  - [Contexts](#Contexts)
+- [Tips](#Tips)
 
 # Installation
 
@@ -215,21 +215,6 @@ Layouts and Content have access to handlebars contexts with the following
 interface:
 
 ```typescript
-export interface HandlebarsFolderContext {
-  name: string;
-  absolutePath: string;
-  /** Path relative to the root of the page */
-  path: string;
-  subfolders: HandlebarsFolderContext[];
-  pages: {
-    path: string,
-    /** Absolute path to text content of the file without frontmatter */
-    extractedTextPath: string,
-    extension: string,
-    metadata: { [key: string]: any };
-  }[];
-}
-
 export interface HandlebarsContentContext {
   /** Metadata from the page frontmatter merged with defaults */
   metadata: { [key: string]: any };
@@ -238,7 +223,7 @@ export interface HandlebarsContentContext {
   absolutePath: string;
 
   /** Folder containing the current page */
-  folder: HandlebarsFolderContext;
+  folder: HandlebarsFolderContext; // See below for definition
 
   /** filename with extension */
   filename: string;
@@ -259,6 +244,21 @@ export interface HandlebarsContentContext {
 export interface HandlebarsLayoutContext extends HandlebarsContentContext {
   /** Content for the layout to display */
   content: string;
+}
+
+export interface HandlebarsFolderContext {
+  name: string;
+  absolutePath: string;
+  /** Path relative to the root of the page */
+  path: string;
+  subfolders: HandlebarsFolderContext[];
+  pages: {
+    path: string,
+    /** Absolute path to text content of the file without frontmatter */
+    extractedTextPath: string,
+    extension: string,
+    metadata: { [key: string]: any };
+  }[];
 }
 ```
 
