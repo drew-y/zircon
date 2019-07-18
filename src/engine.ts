@@ -206,8 +206,10 @@ export class Engine {
     try {
       const defaults =
         yaml.load(read(path.resolve(this.opts.inputPath, "defaults.yml")));
-      this.defaults = defaults || {};
-    } catch (e) { console.log(e); }
+      this.defaults = defaults;
+    } catch (e) {
+      this.defaults = { layout: "index" };
+    }
   }
 
   private readSrcDir() {

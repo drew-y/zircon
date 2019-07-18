@@ -206,7 +206,6 @@ For more on handlebars helpers, visit [http://handlebarsjs.com/#helpers](http://
 - Handlebars partials go in the `root/paritails` directory (One level only)
 - Handlebars helpers go in the helpers directory as `*.js` (One level only)
   - Each file must export one funtion with `export =`
-- The root directory must have a defaults.yml file with at least a `layout` property defined.
 - `favicon.ico` and static directories defined in the root are coppied into the build directory
 
 ## Contexts
