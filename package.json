@@ -1,6 +1,6 @@
 {
   "name": "zircon",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "A simple static site generator for review oriented websites",
   "main": "dist/index.js",
   "types": "src/index.js",
