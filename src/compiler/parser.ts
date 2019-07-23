@@ -6,20 +6,19 @@ function parseYAMLString(yamlStr: string): object | null {
   return yaml.load(yamlStr.replace(/-{3,}/gm, ""));
 }
 
-function extractYAML(opts: { start: number, end: number, burrito: string }): ParserOutput {
-  const metadata = parseYAMLString(opts.burrito.slice(opts.start, opts.end));
-  return { body: opts.burrito.slice(opts.end).trim(), metadata: (metadata ? metadata : {}) };
+function extractYAML(opts: { start: number, end: number, trimmedDoc: string }): ParserOutput {
+  const metadata = parseYAMLString(opts.trimmedDoc.slice(opts.start, opts.end));
+  return { body: opts.trimmedDoc.slice(opts.end).trim(), metadata: (metadata ? metadata : {}) };
 }
 
-function findYAML(trimmedBurrito: string): { start: number, end: number } {
-  const regex = /^-{3,}(.|\n)*-{3,}/g;
-  const match = regex.exec(trimmedBurrito);
+function findYAML(trimmedDoc: string): { start: number, end: number } {
+  const regex = /^(---).*?(---)/gs;
+  const match = regex.exec(trimmedDoc);
   if (!match) return { start: 0, end: 0 };
   return { start: match.index, end: regex.lastIndex };
 }
 
-export function extractDocumentBodyAndMetadata(burrito: string): ParserOutput {
-  const trimmedBurrito = burrito.trim();
-  const { start, end } = findYAML(trimmedBurrito);
-  return extractYAML({ start, end, burrito: trimmedBurrito });
+export function extractDocumentBodyAndMetadata(doc: string): ParserOutput {
+  const trimmedDoc = doc.trim();
+  return extractYAML({ ...findYAML(trimmedDoc), trimmedDoc });
 }
