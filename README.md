@@ -2,18 +2,18 @@
 
 A simple static site generator with a focus on markdown and handlebars
 
-- [<img src="docs/static/blue-gem.png" alt="" style="width: 22px"/> Zircon Static Site Generator](#img-src%22docsstaticblue-gempng%22-alt%22%22-style%22width-22px%22-Zircon-Static-Site-Generator)
-- [Installation](#Installation)
-- [Quick Start](#Quick-Start)
-- [Documentation](#Documentation)
-  - [Zircon Site Structure](#Zircon-Site-Structure)
-  - [Content](#Content)
-  - [Layouts](#Layouts)
-  - [Partials](#Partials)
-  - [Helpers](#Helpers)
-  - [Rules Overview](#Rules-Overview)
-  - [Contexts](#Contexts)
-- [Tips](#Tips)
+- [<img src="docs/static/blue-gem.png" alt="" style="width: 22px"/> Zircon Static Site Generator](#img-src%22docsstaticblue-gempng%22-alt%22%22-style%22width-22px%22-zircon-static-site-generator)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+- [Documentation](#documentation)
+  - [Zircon Site Structure](#zircon-site-structure)
+  - [Content](#content)
+  - [Layouts](#layouts)
+  - [Partials](#partials)
+  - [Helpers](#helpers)
+  - [Rules Overview](#rules-overview)
+  - [Contexts](#contexts)
+- [Tips](#tips)
 
 # Installation
 
@@ -53,36 +53,6 @@ http-server site
 - `static` - Folder that is copied into the build
 - `favicon.ico` - The sites favicon
 - `defaults.yml` - Acts as the default info in each content frontmatter
-
-See the example in the [content](#content) section.
-
-
-## Content
-
-The content directory is the most important directory in a Zircon site. It is where
-all the main content of your site goes. The final site output directly mirrors the
-structure of this folder.
-
-Detailed Rules:
-
-- `.md` files are passed through a markdown compiler, followed by the handlebars
-compiler.
-
-- `.hbs and .md` Are processed by the handlebars compiler followed by the markdown
-  compiler. Any handlebars expressions are given a context containing the following
-  data:
-  - The content frontmatter data merged with the data from defaults.yaml
-  - A "root" object that decribes the entire site (see SiteFolder src/definitions.ts for interface)
-  - A "local" object that decribes the directory the content file is in. (see SiteFolder src/definitions.ts for interface)
-
-- `.hbs, .md, and .html` Are finally injected into the layout specified by either the
-front matter or the `defaults.yml` file (if layout is not defined in front matter). Once
-handlebars has finished compiling the file it is written to the output directory.
-
-- `All other files` are coppied exactly as they are to the output dir.
-
-Note. The "front matter" is a plain text metadata specified at the top of a content file
-in yaml format and in between two sets of three dashes (`--- YAML ---`).
 
 **Example:**
 
@@ -128,6 +98,31 @@ Final ./site:
 - index.html
 - favicon.ico
 ```
+
+## Content
+
+The content directory is the most important directory in a Zircon site. It is where
+all the main content of your site goes. The final site output directly mirrors the
+structure of this folder.
+
+Detailed Rules:
+
+- `.md` files are passed through a markdown compiler, followed by the handlebars
+compiler.
+
+- `.hbs and .md` Are processed by the handlebars compiler. Any handlebars expressions are given a context containing the following data:
+  - The content frontmatter data merged with the data from defaults.yaml
+  - A "root" object that decribes the entire site (see SiteFolder src/definitions.ts for interface)
+  - A "local" object that decribes the directory the content file is in. (see SiteFolder src/definitions.ts for interface)
+
+- `.hbs, .md, and .html` Are finally injected into the layout specified by either the
+front matter or the `defaults.yml` file (if layout is not defined in front matter). Once
+handlebars has finished compiling the file it is written to the output directory.
+
+- `All other files` are coppied exactly as they are to the output dir.
+
+Note. The "front matter" is a plain text metadata specified at the top of a content file
+in yaml format and in between two sets of three dashes (`--- YAML ---`).
 
 ## Layouts
 
